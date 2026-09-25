@@ -1,0 +1,20 @@
+{
+  "name": "ourpay",
+  "interface": {
+    "displayName": "OurPay"
+  },
+  "plugins": [
+    {
+      "name": "ourpay-wallet",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ourpay-wallet"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

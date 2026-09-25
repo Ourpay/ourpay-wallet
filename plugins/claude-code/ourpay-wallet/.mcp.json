@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "ourpay-wallet": {
+      "command": "node",
+      "args": [
+        "${CLAUDE_PLUGIN_ROOT}/scripts/wallet-mcp.mjs"
+      ]
+    }
+  }
+}

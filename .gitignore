@@ -1,0 +1,5 @@
+node_modules/
+source/dist/
+.env*
+.connection*
+.mcpregistry*

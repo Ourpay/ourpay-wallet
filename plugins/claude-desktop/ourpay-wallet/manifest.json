@@ -1,0 +1,40 @@
+{
+  "manifest_version": "0.3",
+  "name": "ourpay-wallet",
+  "version": "0.9.1",
+  "description": "OurPay wallets for AI agents and their owners",
+  "author": {
+    "name": "OurPay"
+  },
+  "homepage": "https://wallet.ourpay.dev/agents",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ourpay/ourpay-wallet"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "wallet",
+    "payments",
+    "mcp",
+    "agents",
+    "crypto",
+    "hyperliquid"
+  ],
+  "display_name": "OurPay Wallet",
+  "icon": "assets/logo.png",
+  "server": {
+    "type": "node",
+    "entry_point": "scripts/wallet-mcp.mjs",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/scripts/wallet-mcp.mjs"
+      ]
+    }
+  },
+  "compatibility": {
+    "runtimes": {
+      "node": ">=24"
+    }
+  }
+}

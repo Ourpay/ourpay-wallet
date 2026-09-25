@@ -1,0 +1,40 @@
+{
+  "name": "ourpay-wallet",
+  "version": "0.9.1",
+  "description": "One OurPay wallet for people and agents, with recovery, transfers, conversion and merchant purchases.",
+  "author": {
+    "name": "OurPay"
+  },
+  "homepage": "https://wallet.ourpay.dev/agents",
+  "repository": "https://github.com/Ourpay/ourpay-wallet",
+  "license": "Apache-2.0",
+  "keywords": [
+    "wallet",
+    "payments",
+    "mcp",
+    "agents",
+    "crypto",
+    "hyperliquid"
+  ],
+  "interface": {
+    "displayName": "OurPay Wallet",
+    "shortDescription": "A wallet for you and your agent.",
+    "longDescription": "Sign in to one OurPay account to share its recoverable wallet across agents. Authorize transfers, conversions, trading and app signing, with encrypted account recovery and revocable permissions.",
+    "developerName": "OurPay",
+    "websiteURL": "https://wallet.ourpay.dev/agents",
+    "brandColor": "#03140d",
+    "composerIcon": "./assets/logo.png",
+    "logo": "./assets/logo.png",
+    "logoDark": "./assets/logo.png",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Connect to my OurPay account and show the sign-in link.",
+      "Check my wallet balance and recent payments."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}

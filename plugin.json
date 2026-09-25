@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "ourpay-wallet",
+  "version": "0.9.1",
+  "description": "OurPay wallets for AI agents and their owners",
+  "author": {
+    "name": "OurPay"
+  },
+  "homepage": "https://wallet.ourpay.dev/agents",
+  "repository": "https://github.com/Ourpay/ourpay-wallet",
+  "license": "Apache-2.0",
+  "keywords": [
+    "wallet",
+    "payments",
+    "mcp",
+    "agents",
+    "crypto",
+    "hyperliquid"
+  ]
+}

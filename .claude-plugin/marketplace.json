@@ -1,0 +1,14 @@
+{
+  "name": "ourpay",
+  "owner": {
+    "name": "OurPay"
+  },
+  "plugins": [
+    {
+      "name": "ourpay-wallet",
+      "source": "./plugins/claude-code/ourpay-wallet",
+      "description": "OurPay wallets for AI agents and their owners",
+      "version": "0.9.1"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Ourpay/ourpay-wallet",
+  "title": "OurPay Wallet",
+  "version": "0.9.1",
+  "description": "Crypto wallet for AI agents: balances, payments, swaps and trading with owner controls.",
+  "websiteUrl": "https://wallet.ourpay.dev/agents",
+  "repository": {
+    "url": "https://github.com/Ourpay/ourpay-wallet",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/Ourpay/ourpay-wallet/v0.9.1/assets/logo.png",
+      "mimeType": "image/png",
+      "sizes": [
+        "512x512"
+      ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.ourpay.dev/wallet/mcp"
+    }
+  ]
+}

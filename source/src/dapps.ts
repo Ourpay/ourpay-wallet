@@ -1,0 +1,5 @@
+export { AgentWalletClient, WalletAPIError } from './client.js'
+export { OurPayProvider, WalletProviderError } from './provider.js'
+export type { OurPayProviderOptions } from './provider.js'
+export { OurPayWalletConnect } from './walletconnect.js'
+export type { OurPayWalletConnectOptions } from './walletconnect.js'

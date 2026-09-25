@@ -1,0 +1,18 @@
+name: Validate release
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+      - run: npm ci
+        working-directory: source
+      - run: npm run build
+        working-directory: source

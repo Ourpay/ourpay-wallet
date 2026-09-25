@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ourpay-wallet": {
+      "command": "node",
+      "args": ["scripts/wallet-mcp.mjs"],
+      "cwd": "."
+    }
+  }
+}

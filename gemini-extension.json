@@ -1,0 +1,14 @@
+{
+  "name": "ourpay-wallet",
+  "version": "0.9.1",
+  "description": "OurPay wallets for AI agents and their owners",
+  "contextFileName": "GEMINI.md",
+  "mcpServers": {
+    "ourpay-wallet": {
+      "command": "node",
+      "args": [
+        "${extensionPath}/scripts/wallet-mcp.mjs"
+      ]
+    }
+  }
+}
