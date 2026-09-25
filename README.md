@@ -67,7 +67,7 @@ Read [PROTOCOLS.md](PROTOCOLS.md) for the precise capability map. A pending tran
 
 ## Release verification
 
-Wallet execution and retry logic passed 217 backend tests using local chains and simulated providers. The previous runtime release passed 28 SDK and 19 hosted MCP checks; four optional SDK integration tests require separate fixtures and were skipped. Public provider quotes and deployed read endpoints were checked. A funded mainnet end-to-end deposit and trade has not yet been verified.
+Wallet execution and retry logic passed 217 backend tests using local chains and simulated providers. The SDK and hosted connector passed 28 SDK and 19 hosted MCP checks; four optional SDK integration tests require separate fixtures and were skipped. Public provider quotes and deployed read endpoints were checked. A funded mainnet end-to-end deposit and trade has not yet been verified.
 
 Public downloads and a self-hosted marketplace are separate from a reviewed vendor directory listing. [DISTRIBUTION.md](DISTRIBUTION.md) records the publication routes and restrictions.
 
