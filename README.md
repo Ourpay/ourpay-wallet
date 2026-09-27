@@ -118,6 +118,7 @@ Save the initial recovery phrase privately. You can reveal it later in wallet Se
 | [TOOLS.md](TOOLS.md) | All 57 canonical tools, descriptions and complete input JSON Schemas |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Cached tools, sign-in, approvals, gas/route failures, stale data and uncertain orders |
 | [TESTING.md](TESTING.md) | Test commands, skipped/live distinctions and what an end-to-end pass requires |
+| [RELEASE_VERIFICATION.md](RELEASE_VERIFICATION.md) | v0.10.0 deployments, live client discovery, benchmarks and verification limits |
 | [DISTRIBUTION.md](DISTRIBUTION.md) | Public distribution routes and vendor-review boundaries |
 | [CHANGELOG.md](CHANGELOG.md) | Versioned changes and repository documentation updates |
 | [Agent skill](skills/ourpay-wallet/SKILL.md) | Task-oriented instructions and packaged references |
@@ -134,7 +135,7 @@ npm ci
 npm run build
 ```
 
-The application repository owns the full tests and generation pipeline; this public repository includes the SDK source, plugin manifests, packaged runtime and documentation. Local packaging/schema/fixture tests, live read checks and funded execution are different evidence. See the dated [0.9.6 verification snapshot](TESTING.md#dated-096-verification-snapshot), including skipped checks and the corrected canonical MCP deployment.
+The application repository owns the full tests and generation pipeline; this public repository includes the SDK source, plugin manifests, packaged runtime and documentation. Local packaging/schema/fixture tests, live read checks and funded execution are different evidence. See the [v0.10.0 release verification](RELEASE_VERIFICATION.md) for live deployments, all 57 tools observed in ChatGPT, snapshot benchmarks and the funded acceptance tests that remain unverified. Earlier release evidence remains in [TESTING.md](TESTING.md).
 
 Documentation on `main` can be newer than a tagged package. Tags, archives and checksums remain fixed; changes to this README do not upgrade an installed executable. Pin a reviewed tag/commit for reproducible Git installs and use the matching release archive when updating a runtime.
 

@@ -95,7 +95,33 @@ Use dedicated test accounts and explicitly authorized amounts for monetary check
 | Crypto subscriptions | 41 tests passed against isolated Anvil chains | Real local token authorization, renewal, cancellation, allowance/balance failures and multiple deployment selection; no mainnet charge |
 | Subscription contract | 15 tests passed, including two 512-case fuzz tests | Local Solidity execution |
 | SDK/MCP packages | 37 passed; 4 skipped | 57 tools, exact trigger/runner inputs, retry identity and six native bundles; external live integration tests remain separate |
-| Frontend | Typecheck passed | Runner controls and shared-price feed integration |
+| Canonical MCP | 20 tests passed; build and typecheck passed | Authentication, registration and routing through the shared service |
+| Framework loading | Four clients loaded all 57 tools | OpenAI Agents SDK, LangChain/LangGraph, PydanticAI and Google ADK; no model inference or trades |
+| Final catalog/feed regression | 42 targeted tests passed | Bulk venue metadata, fenced shared catalog, native triggers and runners; overlaps the broader suite above |
+| Frontend | Typecheck, targeted lint and production build passed; 4 proxy tests passed | Runner controls, shared-price feed and owner-authenticated route allowlists |
 | Polygon subscription readiness | Passed at block 94533675 | Exact deployed runtime, token, recipient, executor, unpaused state and gas; production cap is two payments per mandate |
 
-Native trigger fills and cancellations have not been demonstrated on a newly funded venue account in this release. Passing local/testnet tests does not guarantee mainnet execution, profitability, liquidity or fees. No user funds were moved during this release verification. Live deployment and delivery benchmark results are recorded separately after rollout.
+Native trigger fills and cancellations have not been demonstrated on a newly funded venue account in this release. Passing local/testnet tests does not guarantee mainnet execution, profitability, liquidity or fees. No user funds were moved during this release verification.
+
+### Production rollout and client discovery
+
+On September 27, 2026, Render confirmed the API, worker and scheduler live on commit `785f2f3f06b270e670328990464b2e5128099fca`. Both MCP services run `57a002067d5a396348b850dce8b57b84481041d4`; subsequent commits changed backend catalog handling, the wallet proxy and verification scripts, not the SDK/MCP runtime. The dedicated wallet Cloudflare deployment is `a576b484-96f1-44a0-9e8f-fba2de88c57a`.
+
+Authenticated hosted MCP market discovery succeeded on both mainnet and testnet after rollout. The wallet Trade screen displayed live shared-feed prices and the persistent-plan panel on both networks, and testnet search returned non-BTC spot results. These were read-only checks; no plan or exchange order was created.
+
+ChatGPT initially retained its old 51-tool catalog. After **Refresh tools** in the existing connector settings and a full page reload, its tool dialog showed **23 write + 34 read = 57 tools**, including `exchange_updates`, the four runner tools and native trigger inputs. This verifies discovery by that authenticated host; it does not establish successful execution of each tool. Already-open conversations may need to reload their tool catalog. Existing local packages must be updated to v0.10.0 to receive the new schemas.
+
+The [v0.10.0 GitHub release](https://github.com/Ourpay/ourpay-wallet/releases/tag/v0.10.0) is published. All seven archives downloaded from GitHub and the wallet site matched the published SHA-256 manifest, and source CI passed. The official MCP Registry lists `io.github.Ourpay/ourpay-wallet` v0.10.0 as active/latest. Registry publication is distinct from individual vendor marketplace approval. Tagged packages remain immutable; this verification record was added to repository documentation after rollout.
+
+### Measured snapshot response time
+
+Ten sequential authenticated hosted MCP `exchange_market_data` calls before and after the initial feature deployment used identical inputs: mainnet, `perp:BTC`, `interval=1m`, `limit=10`.
+
+| Observation | Samples | Median | p95 (nearest rank) | Errors |
+| --- | --- | --- | --- | --- |
+| Before feature deployment, 10:55 UTC | 10 | 1,447 ms | 1,831 ms | 0 |
+| After feature deployment, 11:01 UTC | 10 | 1,079 ms | 1,842 ms | 0 |
+
+This measures client-to-hosted-tool response time for a full snapshot, including connector, gateway, API and upstream/cache reads. The median fell in this small sample; tail latency did not improve. It is not a measurement of venue-to-agent streaming delay, model decision time, order acknowledgment, trigger firing or fills, and it does not establish an SLA. Later bulk-metadata/catalog fixes are not included in this before/after comparison.
+
+`server/scripts/benchmark_wallet_market_feed.py` can separately measure read-only API round trip and OurPay-receive-to-response age using an existing read credential supplied privately through `OURPAY_BENCHMARK_TOKEN`. The live long-poll age benchmark remains unmeasured in this release: the aggregate venue feed has no source timestamp, and the available local credential was revoked. No replacement credential was minted or wallet authority expanded for a benchmark.
