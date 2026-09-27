@@ -4,7 +4,7 @@ import type { AgentWalletClient } from './client.js'
 
 export interface FundingCapabilities {
   enabled: boolean
-  sources: { chain_id: number; name: string; token: string; balance: string | null; available: boolean }[]
+  sources: { chain_id: number; name: string; token: string; balance: string | null; available: boolean; error_code: 'timeout' | 'rpc_unavailable' | null; error: string | null }[]
   destination_chains: number[]
   destinations: string[]
   instructions: string[]

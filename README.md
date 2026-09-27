@@ -57,7 +57,9 @@ The integration bundle also generates configurations for 18 clients and includes
 
 ## Capabilities
 
-The same 47 MCP tools provide wallet addresses, balances, network and token discovery, transfers, swaps, bridging, OurPay merchant checkout, policy-constrained contract calls, signing, crypto-app connections, and Hyperliquid spot/perpetual orders.
+The same 51 MCP tools provide wallet addresses, balances, network and token discovery, transfers, swaps, bridging, cross-merchant product search and checkout, policy-constrained contract calls, signing, crypto-app connections, and Hyperliquid spot/perpetual orders.
+
+Public merchant products enter search automatically. Agents can find products by name and description, open the returned checkout links to inspect current details, and use the existing authorized purchase flow without asking the user for a checkout URL.
 
 Supported native USDC on Ethereum, Arbitrum, Base, Optimism, Polygon and Avalanche can fund network gas and Hyperliquid through quoted routes. Availability depends on network configuration, providers and liquidity. Solana-only USDC with zero SOL is not a supported gasless source. HyperCore withdrawals and internal collateral transfers are not implemented.
 

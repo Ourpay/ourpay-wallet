@@ -4,7 +4,9 @@ import type { SignatureRequest, WalletSignature } from './signature-tools.js'
 import type { WalletFunding, FundingCapabilities, FundingQuoteRequest } from './funding-tools.js'
 export type { WalletFunding } from './funding-tools.js'
 import type { DappConnection } from './dapp-tools.js'
-import type { ExchangeAccount, ExchangeCapabilities, ExchangeFills, ExchangeMarket, ExchangeNetwork, ExchangeOrder, ExchangeOrderRequest } from './exchange-types.js'
+import type { ProductSearchOptions, ProductSearchResults } from './catalog-types.js'
+export type * from './catalog-types.js'
+import type { ExchangeAccount, ExchangeCapabilities, ExchangeCandleInterval, ExchangeFills, ExchangeMarket, ExchangeMarketData, ExchangeNetwork, ExchangeOrder, ExchangeOrderRequest } from './exchange-types.js'
 export type * from './exchange-types.js'
 export type { SignatureRequest, WalletSignature } from './signature-tools.js'
 export type { Trade, TradeRequest, TradingCapabilities, TradingPolicy, TradingRule } from './trade-types.js'
@@ -128,10 +130,14 @@ export interface CheckoutDetails {
 
 export interface Checkout {
   id: string
+  client_secret: string
+  url: string
   status: string
   total_amount: number
   currency: string
   payment_processor: string
+  product_id: string | null
+  product: { id: string; name: string; description: string | null; medias: Array<{ public_url: string }> } | null
 }
 
 export class WalletAPIError extends Error {
@@ -179,10 +185,15 @@ export function validateAPIURL(value: string): string {
 
 export class AgentWalletClient {
   readonly apiURL: string
-  #token: string
+  #token?: string
 
-  constructor(options: { apiURL: string; token: string }) {
+  constructor(options: { apiURL: string } & ({ token: string } | { browserSession: true })) {
     this.apiURL = validateAPIURL(options.apiURL)
+    if ('browserSession' in options) {
+      if (typeof window === 'undefined' || new URL(this.apiURL).origin !== window.location.origin)
+        throw new Error('Browser wallet sessions require a same-origin API proxy.')
+      return
+    }
     if (!/^ourpay_aw_[A-Za-z0-9_-]{43,128}$/.test(options.token))
       throw new Error('The wallet connection credential is invalid.')
     this.#token = options.token
@@ -192,10 +203,10 @@ export class AgentWalletClient {
     let response: Response
     try {
       response = await fetch(`${this.apiURL}${base}${path}`, {
-        method, redirect: 'error', signal: AbortSignal.timeout(30_000),
+        method, credentials: this.#token ? 'omit' : 'same-origin', redirect: 'error', signal: AbortSignal.timeout(30_000),
         headers: {
           Accept: 'application/json', 'Content-Type': 'application/json',
-          ...(authorize ? { Authorization: `Bearer ${this.#token}` } : {}),
+          ...(authorize && this.#token ? { Authorization: `Bearer ${this.#token}` } : {}),
         },
         body: body === undefined ? undefined : JSON.stringify(body),
       })
@@ -214,6 +225,7 @@ export class AgentWalletClient {
   }
 
   async provision(name = 'AI agent'): Promise<ProvisionedWallet> {
+    if (!this.#token) throw new WalletAPIError(403, 'Connect this browser from the OurPay wallet page.')
     try { return { wallet: await this.wallet(), setup_url: null } }
     catch (error) { if (!(error instanceof WalletAPIError) || error.status !== 401) throw error }
     const request = await this.request<NonNullable<ProvisionedWallet['connection_request']>>('/connection-requests', 'POST', { name, connection_token: this.#token }, false)
@@ -236,8 +248,21 @@ export class AgentWalletClient {
 
   approval(id: string) { return this.request<WalletApproval>(`/me/approvals/${encodeURIComponent(id)}`) }
   exchangeCapabilities(): Promise<ExchangeCapabilities> { return this.request('/me/exchange/capabilities') }
-  exchangeMarkets(network: ExchangeNetwork, search = '', limit = 100): Promise<ExchangeMarket[]> { return this.request(`/me/exchange/markets?${new URLSearchParams({ network, search, limit: String(limit) })}`) }
-  exchangeAccount(network: ExchangeNetwork): Promise<ExchangeAccount> { return this.request(`/me/exchange/account?${new URLSearchParams({ network })}`) }
+  exchangeMarkets(network: ExchangeNetwork, search = '', limit = 100, offset = 0): Promise<ExchangeMarket[]> { return this.request(`/me/exchange/markets?${new URLSearchParams({ network, search, limit: String(limit), offset: String(offset) })}`) }
+  exchangeAccount(network: ExchangeNetwork, dex = ''): Promise<ExchangeAccount> { return this.request(`/me/exchange/account?${new URLSearchParams({ network, dex })}`) }
+  exchangeMarketData(network: ExchangeNetwork, market: string, interval: ExchangeCandleInterval = '1h', limit = 120): Promise<ExchangeMarketData> { return this.request(`/me/exchange/market-data?${new URLSearchParams({ network, market, interval, limit: String(limit) })}`) }
+  async placeOrders(orders: ExchangeOrderRequest[]) {
+    if (!orders.length || orders.length > 10 || new Set(orders.map(order => order.idempotency_key)).size !== orders.length)
+      throw new WalletAPIError(400, 'Supply 1–10 orders with distinct idempotency keys.')
+    return Promise.all(orders.map(async request => {
+      try { return { idempotency_key: request.idempotency_key, order: await this.placeOrder(request) } }
+      catch (error) {
+        if (error instanceof WalletApprovalRequiredError) return { idempotency_key: request.idempotency_key, approval: error.approval }
+        if (error instanceof WalletAPIError) return { idempotency_key: request.idempotency_key, error: { status: error.status, message: error.message } }
+        throw error
+      }
+    }))
+  }
   placeOrder(data: ExchangeOrderRequest): Promise<ExchangeOrder> { return this.request('/me/exchange/orders', 'POST', data) }
   exchangeOrder(id: string): Promise<ExchangeOrder> { return this.request(`/me/exchange/orders/${encodeURIComponent(id)}`) }
   exchangeOrders(network: ExchangeNetwork): Promise<ExchangeOrder[]> { return this.request(`/me/exchange/orders?${new URLSearchParams({ network })}`) }
@@ -278,6 +303,34 @@ export class AgentWalletClient {
   purchases(): Promise<Purchase[]> { return this.request('/me/purchases') }
   purchase(id: string): Promise<Purchase> { return this.request(`/me/purchases/${encodeURIComponent(id)}`) }
   executePurchase(id: string): Promise<Purchase> { return this.request(`/me/purchases/${encodeURIComponent(id)}/execute`, 'POST') }
+  searchProducts(options: ProductSearchOptions = {}): Promise<ProductSearchResults> {
+    const query = new URLSearchParams()
+    if (options.query !== undefined) {
+      if (!options.query.trim() || options.query.length > 200) throw new Error('Product search must be between 1 and 200 characters.')
+      query.set('query', options.query)
+    }
+    if (options.organization_id !== undefined) {
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(options.organization_id)) throw new Error('Invalid merchant ID.')
+      query.set('organization_id', options.organization_id)
+    }
+    if (options.is_recurring !== undefined) query.set('is_recurring', String(options.is_recurring))
+    for (const key of ['page', 'limit'] as const) {
+      const value = options[key]
+      if (value === undefined) continue
+      if (!Number.isSafeInteger(value) || value < 1 || (key === 'limit' && value > 100)) throw new Error(`Invalid search ${key}.`)
+      query.set(key, String(value))
+    }
+    return this.request(`/search?${query}`, 'GET', undefined, false, '/v1/products')
+  }
+  openProductCheckout(checkoutURL: string): Promise<Checkout> {
+    const url = new URL(checkoutURL)
+    const base = new URL(this.apiURL)
+    if (url.origin !== base.origin || url.username || url.password || url.search || url.hash ||
+      !/^\/v1\/products\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\/checkout$/i.test(url.pathname)) {
+      throw new Error('Use a product checkout_url returned by this OurPay catalog.')
+    }
+    return this.request(url.pathname, 'POST', undefined, false, '')
+  }
   checkout(secret: string): Promise<Checkout> {
     return this.request(`/client/${encodeURIComponent(secret)}`, 'GET', undefined, false, '/v1/checkouts')
   }
@@ -285,6 +338,6 @@ export class AgentWalletClient {
     const checkout = await this.checkout(secret)
     if (checkout.status === 'succeeded') throw new WalletAPIError(409, 'This checkout is already paid. Do not pay again.')
     if (checkout.status === 'confirmed' && checkout.payment_processor === 'bitcart') return checkout
-    return this.request(`/client/${encodeURIComponent(secret)}/confirm`, 'POST', { ...details, payment_processor: 'bitcart' }, false, '/v1/checkouts')
+    return this.request(`/client/${encodeURIComponent(secret)}/confirm`, 'POST', { ...details, payment_processor: 'bitcart', payment_method_type: 'crypto' }, false, '/v1/checkouts')
   }
 }

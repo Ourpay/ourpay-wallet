@@ -1,6 +1,6 @@
 {
   "name": "@ourpay/agent-wallets",
-  "version": "0.9.1",
+  "version": "0.9.5",
   "private": true,
   "description": "OurPay wallets for AI agents and their owners",
   "type": "module",
@@ -12,12 +12,20 @@
     "ourpay-wallet-configure": "./dist/configure.js"
   },
   "exports": {
-    ".": "./dist/client.js",
+    ".": {
+      "browser": "./src/client.ts",
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
+    },
     "./mcp": "./dist/mcp.js",
     "./remote": "./dist/remote.js",
     "./adapters": "./dist/adapters.js",
     "./provider": "./dist/provider.js",
-    "./walletconnect": "./dist/walletconnect.js",
+    "./walletconnect": {
+      "browser": "./src/walletconnect.ts",
+      "types": "./dist/walletconnect.d.ts",
+      "default": "./dist/walletconnect.js"
+    },
     "./integrations": "./dist/integrations.js"
   },
   "scripts": {

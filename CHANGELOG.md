@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.9.5
+
+- Search automatically indexed public products across OurPay merchants, with names and reusable checkout links.
+- Open product checkouts to inspect current details and use the existing authorized wallet purchase flow without a user-supplied link.
+- Keep private products and buyer sessions out of search; recheck eligibility when opening a checkout.
+- 51 tools across the existing MCP and model adapters; six native packages and 18 client profiles.
+
+## 0.9.4
+
+- Preserve app identity when a browser requests individual owner review outside its delegated signing rules.
+- Support documented Hyperliquid exchange signing domains for active official app grants without changing the signed payload.
+- Reuse backend operation IDs across browser tabs and preserve market price precision.
+
+## 0.9.3
+
+- Pair the browser wallet with crypto apps through WalletConnect using a separate revocable credential.
+- Stream Hyperliquid market updates and search the full spot and perpetual catalogue, including builder-deployed venues.
+- Choose explicit isolated/cross margin and submit up to ten independent orders concurrently with per-order retry identity.
+- Read positions and collateral by venue; preserve pre-upgrade order retries.
+
+
 ## 0.9.1
 
 - Public distribution repository with installable Codex, Claude Code and Cursor marketplace manifests, Gemini extension metadata and a portable Agent Plugin.

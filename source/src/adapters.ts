@@ -10,7 +10,7 @@ const failure = (message: string): CallToolResult => ({
   isError: true, content: [{ type: 'text', text: message }],
 })
 const textResult = (result: CallToolResult) => JSON.stringify({
-  isError: result.isError === true, content: result.content,
+  isError: result.isError === true, content: result.content, structuredContent: result.structuredContent,
 })
 
 export class WalletToolSession {
@@ -22,7 +22,7 @@ export class WalletToolSession {
 
   static async create(wallet: AgentWalletClient, options: { allowTools?: readonly string[] } = {}) {
     const server = createWalletMCP(wallet)
-    const client = new Client({ name: 'OurPay model adapter', version: '0.9.1' })
+    const client = new Client({ name: 'OurPay model adapter', version: '0.9.5' })
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
     try {
       await server.connect(serverTransport)
@@ -92,7 +92,7 @@ export class WalletToolSession {
     const result = await this.call(call.name, call.args ?? {})
     return { functionResponse: {
       ...(call.id ? { id: call.id } : {}), name: call.name,
-      response: { isError: result.isError === true, content: result.content },
+      response: { isError: result.isError === true, content: result.content, structuredContent: result.structuredContent },
     } }
   }
 

@@ -9,27 +9,39 @@ export interface ExchangePolicy {
 
 export interface ExchangeCapabilities {
   enabled: boolean; venue: 'hyperliquid'; networks: ExchangeNetwork[]
-  policy: ExchangePolicy | null; owner_permissions_url: string; margin_mode: 'isolated'
+  policy: ExchangePolicy | null; owner_permissions_url: string; margin_mode: 'isolated'; margin_modes: ('isolated' | 'cross')[]; concurrent_positions: boolean
   order_types: string[]; expiry_behavior: string
 }
 
 export interface ExchangeMarket {
   id: string; name: string; coin: string; kind: 'spot' | 'perpetual'; asset: number
+  dex: string; quote_symbol: string; quote_token: number; quote_usd_price: string | null; margin_modes: ('isolated' | 'cross')[]
   size_decimals: number; max_leverage: number; mark_price: string
   funding_rate: string | null; open_interest: string | null
+  previous_day_price: string | null; daily_volume_usd: string | null; oracle_price: string | null
+}
+
+export type ExchangeCandleInterval = '1m' | '3m' | '5m' | '15m' | '30m' | '1h' | '2h' | '4h' | '8h' | '12h' | '1d' | '3d' | '1w'
+
+export interface ExchangeMarketData {
+  venue: 'hyperliquid'; network: ExchangeNetwork; observed_at: string; market: ExchangeMarket
+  interval: ExchangeCandleInterval; order_book: Record<string, unknown> | null
+  recent_trades: Record<string, unknown>[] | null; candles: Record<string, unknown>[] | null
+  errors: Record<string, string>
 }
 
 export interface ExchangeAccount {
   venue: 'hyperliquid'; network: ExchangeNetwork; address: string
-  perpetuals: Record<string, unknown>; spot: Record<string, unknown>
+  dex: string; perpetuals: Record<string, unknown>; spot: Record<string, unknown>
   open_orders: Record<string, unknown>[]; funding_instructions_url: string
+  observed_at: string; account_url: string; trading_url: string
 }
 
 export interface ExchangeOrderRequest {
   idempotency_key: string; network: ExchangeNetwork; market: string; side: 'buy' | 'sell'
   size: string; limit_price: string; expires_at?: string | null
   order_type?: 'limit' | 'market'; time_in_force?: 'Gtc' | 'Alo'
-  reduce_only?: boolean; leverage?: number
+  reduce_only?: boolean; leverage?: number; margin_mode?: 'isolated' | 'cross'
 }
 
 export interface ExchangeOrder {

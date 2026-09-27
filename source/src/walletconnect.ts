@@ -1,18 +1,19 @@
 import type { IWalletKit, WalletKitTypes } from '@reown/walletkit'
 import type { SessionTypes } from '@walletconnect/types'
 import { buildApprovedNamespaces } from '@walletconnect/utils'
-import { AgentWalletClient } from './client.js'
-import { OurPayProvider, WalletProviderError, walletReadMethods, walletSigningMethods, type OurPayProviderOptions } from './provider.js'
+import type { AgentWalletClient } from './client.js'
+import { OurPayProvider, WalletProviderError, walletReadMethods, walletSigningMethods } from './provider.ts'
+import type { OurPayProviderOptions } from './provider.js'
 
 type Response = Parameters<IWalletKit['respondSessionRequest']>[0]['response']
 type SavedRequest = { fingerprint: string; response?: Response }
 export interface OurPayWalletConnectOptions extends Omit<OurPayProviderOptions, 'chainId'> {
   approveSession?: (proposal: WalletKitTypes.SessionProposal, namespaces: SessionTypes.Namespaces) => Promise<boolean>
+  onSessionConnected?: () => void
   onError: (error: unknown) => void
 }
 
 export class OurPayWalletConnect {
-  #providers = new Map<string, OurPayProvider>()
   #running = new Map<string, Promise<void>>()
   #started = false
   constructor(private readonly kit: IWalletKit, private readonly wallet: AgentWalletClient, private readonly options: OurPayWalletConnectOptions) {}
@@ -66,7 +67,9 @@ export class OurPayWalletConnect {
           throw new WalletProviderError(4100, 'Authorize this app in OurPay and pair again.', { owner_approval_url: connection.owner_approval_url })
         }
       }
-      return await this.kit.approveSession({ id: proposal.id, namespaces })
+      const session = await this.kit.approveSession({ id: proposal.id, namespaces })
+      this.options.onSessionConnected?.()
+      return session
     } catch (error) {
       await this.kit.rejectSession({ id: proposal.id, reason: { code: 5000, message: 'The owner declined or the requested wallet capabilities are unsupported.' } })
       throw error
@@ -76,7 +79,9 @@ export class OurPayWalletConnect {
   async handleRequest(event: WalletKitTypes.SessionRequest): Promise<void> {
     const key = `ourpay:walletconnect:${event.topic}:${event.id}`
     if (this.#running.has(key)) return this.#running.get(key)
-    const running = this.respond(key, event)
+    const running = typeof navigator !== 'undefined' && navigator.locks
+      ? navigator.locks.request(key, () => this.respond(key, event))
+      : this.respond(key, event)
     this.#running.set(key, running)
     try { await running } finally { this.#running.delete(key) }
   }
@@ -101,9 +106,12 @@ export class OurPayWalletConnect {
       await this.kit.core.storage.setItem(key, { fingerprint } satisfies SavedRequest)
       const chain = Number(chainId.split(':')[1])
       const origin = new URL(session.peer.metadata.url).origin
-      const providerKey = `${event.topic}:${chain}`
-      let provider = this.#providers.get(providerKey)
-      if (!provider) { provider = new OurPayProvider(this.wallet, { ...this.options, origin, chainId: chain }); this.#providers.set(providerKey, provider) }
+      const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(key))).slice(0, 16)
+      hash[6] = (hash[6] & 0x0f) | 0x80
+      hash[8] = (hash[8] & 0x3f) | 0x80
+      const hex = Array.from(hash, byte => byte.toString(16).padStart(2, '0')).join('')
+      const requestId = `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`
+      const provider = new OurPayProvider(this.wallet, { ...this.options, origin, chainId: chain, requestId })
       const result = await provider.request({ method: request.method, params: request.params })
       response = { id: event.id, jsonrpc: '2.0', result }
     } catch (error) {

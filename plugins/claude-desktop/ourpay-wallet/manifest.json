@@ -1,7 +1,7 @@
 {
   "manifest_version": "0.3",
   "name": "ourpay-wallet",
-  "version": "0.9.1",
+  "version": "0.9.5",
   "description": "OurPay wallets for AI agents and their owners",
   "author": {
     "name": "OurPay"

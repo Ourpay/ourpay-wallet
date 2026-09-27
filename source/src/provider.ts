@@ -1,9 +1,9 @@
-import { AgentWalletClient, WalletAPIError, WalletApprovalRequiredError } from './client.js'
-import type { WalletApprovalRequired } from './client.js'
+import { WalletAPIError, WalletApprovalRequiredError } from './client.ts'
+import type { AgentWalletClient, WalletApprovalRequired } from './client.js'
 import type { ExecuteCalls, WalletCall } from './call-types.js'
 
 type Listener = (...args: unknown[]) => void
-export type OurPayProviderOptions = { chainId: number; maxNetworkFee: string; origin?: string; timeoutMs?: number; pollMs?: number; onApprovalRequest?: (request: WalletApprovalRequired) => void; onSignatureRequest?: (request: { id: string; owner_approval_url: string }) => void; onConnectionRequest?: (request: { id: string; owner_approval_url: string }) => void }
+export type OurPayProviderOptions = { chainId: number; maxNetworkFee: string; requestId?: string; origin?: string; timeoutMs?: number; pollMs?: number; onApprovalRequest?: (request: WalletApprovalRequired) => void; onSignatureRequest?: (request: { id: string; owner_approval_url: string }) => void; onConnectionRequest?: (request: { id: string; owner_approval_url: string }) => void }
 export const walletReadMethods = ['eth_blockNumber', 'eth_getBalance', 'eth_getCode', 'eth_getStorageAt', 'eth_call', 'eth_estimateGas', 'eth_gasPrice', 'eth_getTransactionCount', 'eth_getTransactionReceipt', 'eth_getTransactionByHash', 'eth_getBlockByNumber', 'eth_getBlockByHash', 'eth_getLogs']
 export const walletSigningMethods = ['personal_sign', 'eth_signTypedData_v4', 'eth_sendTransaction', 'wallet_sendCalls', 'wallet_getCallsStatus', 'wallet_getCapabilities']
 const reads = new Set(walletReadMethods)
@@ -64,7 +64,7 @@ export class OurPayProvider {
   private pending(chain: number, method: string, params: unknown) {
     const fingerprint = JSON.stringify([chain, method, params])
     let pending = this.#pending.get(fingerprint)
-    if (!pending) { pending = { key: crypto.randomUUID(), expiresAt: new Date(Date.now() + 15 * 60_000).toISOString() }; this.#pending.set(fingerprint, pending) }
+    if (!pending) { pending = { key: this.options.requestId ?? crypto.randomUUID(), expiresAt: new Date(Date.now() + 15 * 60_000).toISOString() }; this.#pending.set(fingerprint, pending) }
     return { fingerprint, pending }
   }
   private async poll<T>(operation: () => Promise<T | undefined>, data: unknown): Promise<T> {
@@ -193,7 +193,7 @@ export class OurPayProvider {
     const { pending, fingerprint } = this.pending(chain, method, payload)
     if (!pending.operation) {
       const connection = await this.dapp(chain)
-      const record = await this.wallet.requestSignature({ idempotency_key: pending.key, chain_id: chain, method, payload, expires_at: pending.expiresAt, ...(connection ? { dapp_connection_id: connection.id } : {}) })
+      const record = await this.wallet.requestSignature({ idempotency_key: pending.key, chain_id: chain, method, payload, expires_at: pending.expiresAt, ...(connection ? { dapp_connection_id: connection.id, allow_owner_review: true } : {}) })
       pending.operation = record.id
       if (record.status === 'pending') this.options.onSignatureRequest?.(record)
     }

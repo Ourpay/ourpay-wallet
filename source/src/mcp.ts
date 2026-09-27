@@ -22,7 +22,7 @@ const conversionInput = z.object({
 
 export function createWalletMCP(client: AgentWalletClient, options: { provision?: boolean } = {}): McpServer {
   const server = new McpServer({
-    name: 'OurPay Wallet', title: 'OurPay Wallet', version: '0.9.1',
+    name: 'OurPay Wallet', title: 'OurPay Wallet', version: '0.9.5',
     websiteUrl: 'https://wallet.ourpay.dev/agents',
     icons: [{ src: 'https://wallet.ourpay.dev/ourpay-wallet-logo.png', mimeType: 'image/png', sizes: ['512x512'] }],
   })
@@ -35,6 +35,12 @@ export function createWalletMCP(client: AgentWalletClient, options: { provision?
       }
       return {
         isError: true,
+        structuredContent: {
+          error: {
+            status: error instanceof WalletAPIError ? error.status : null,
+            retryable: error instanceof WalletAPIError && (error.status >= 500 || error.status === 429),
+          },
+        },
         content: [{ type: 'text' as const, text: error instanceof WalletAPIError
           ? error.message : 'The wallet request could not be completed. Retry with the same request ID.' }],
       }
@@ -82,7 +88,7 @@ export function createWalletMCP(client: AgentWalletClient, options: { provision?
   }, (data) => result(() => client.transfer(data)))
 
   server.registerTool('ourpay_wallet_transactions', {
-    description: 'Read recent wallet transactions, confirmed transfers and pending requests.',
+    description: 'Read recent transactions initiated through OurPay, including confirmed transfers and pending requests. External incoming deposits are not indexed here. Use balances and canonical on-chain Transfer logs and receipts to verify deposits.',
     inputSchema: z.object({}), annotations: readOnly,
   }, () => result(() => client.transactions()))
 

@@ -4,6 +4,7 @@ import { AgentWalletClient } from './client.js'
 
 export interface SignatureRequest {
   dapp_connection_id?: string
+  allow_owner_review?: boolean
   idempotency_key: string
   chain_id: number
   method: 'personal_sign' | 'eth_signTypedData_v4'
@@ -25,8 +26,8 @@ type ToolResult = (operation: () => Promise<unknown>) => Promise<{ content: { ty
 
 export function registerSignatureTools(server: McpServer, client: AgentWalletClient, result: ToolResult) {
   server.registerTool('ourpay_wallet_request_signature', {
-    description: 'Sign an exact message or EIP-712 payload. With Risky mode off, every signing request waits for owner review, including login messages for connected apps. OurPay emails the owner; show owner_approval_url and poll ourpay_wallet_signature. With owner-enabled Risky mode, supported messages and typed data sign immediately without another confirmation or approval email. Include dapp_connection_id only for an active app grant; scoped personal_sign requires ERC-4361 with matching origin/address/chain and valid timestamps. Otherwise omit it for exact-payload review. The personal_sign payload is {message: "0x<UTF-8 bytes>"}. Typed data must bind domain.chainId. Issued signatures may spend assets outside daily limits and outlive revocation. Keep the same UUID across retries. If Risky mode was enabled while pending, resubmit the identical request to sign it automatically. Never invent owner approval.',
-    inputSchema: z.object({ dapp_connection_id: z.string().uuid().optional(), idempotency_key: z.string().uuid(), chain_id: z.number().int().positive(), method: z.enum(['personal_sign', 'eth_signTypedData_v4']), payload: z.record(z.string(), z.unknown()), expires_at: z.string().datetime({ offset: true }) }),
+    description: 'Sign an exact message or EIP-712 payload. With Risky mode off, every signing request waits for owner review, including login messages for connected apps. OurPay emails the owner; show owner_approval_url and poll ourpay_wallet_signature. With owner-enabled Risky mode, supported messages and typed data sign immediately without another confirmation or approval email. Include dapp_connection_id only for an active app grant; scoped personal_sign requires ERC-4361 with matching origin/address/chain and valid timestamps. Use allow_owner_review=true to request exact owner review outside a delegated app rule while retaining app identity and revocation checks. The personal_sign payload is {message: "0x<UTF-8 bytes>"}. Typed data must bind domain.chainId; active official Hyperliquid app grants also support its documented exchange signing domains for trading delegation, withdrawals and collateral transfers. Issued signatures may spend assets outside daily limits and outlive revocation. Keep the same UUID across retries. If Risky mode was enabled while pending, resubmit the identical request to sign it automatically. Never invent owner approval.',
+    inputSchema: z.object({ dapp_connection_id: z.string().uuid().optional(), allow_owner_review: z.boolean().optional(), idempotency_key: z.string().uuid(), chain_id: z.number().int().positive(), method: z.enum(['personal_sign', 'eth_signTypedData_v4']), payload: z.record(z.string(), z.unknown()), expires_at: z.string().datetime({ offset: true }) }),
     annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
   }, data => result(() => client.requestSignature(data)))
   server.registerTool('ourpay_wallet_signature', {
