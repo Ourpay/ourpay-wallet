@@ -57,9 +57,9 @@ Use quote → execute → original status for conversions, or `ourpay_wallet_con
 
 For a product request without a checkout URL, use `ourpay_wallet_search_products`, paginate and open candidate `checkout_url` values with `ourpay_open_product_checkout`. Compare current product details with the user's preferences. Opening creates an unpaid checkout; keep and reuse its private client secret. Search covers eligible OurPay merchants, not arbitrary internet merchants.
 
-Obtain missing required buyer details from the owner. Use the supported prepare fields, re-read total/currency and payment availability, then quote with `max_from_amount` and source/destination fee caps. A total crypto budget includes required funding and costs, not only the product price. A recurring listing does not implement recurring crypto payments or grant future spending authority.
+Obtain missing required buyer details from the owner. Use the supported prepare fields, re-read total/currency and payment availability, then quote with `max_from_amount` and source/destination fee caps. A total crypto budget includes required funding and costs, not only the product price. For a recurring checkout, read payment_collection.instructions and explicitly pass its exact bounded recurring terms to the quote. Convert maximum_amount to six-decimal USDC base units; preserve maximum_payments, interval and interval_count. Review the entire mandate, not just the first charge. Renewal requires USDC on the configured network; cancel the subscription to stop future pulls. Wallet pause or agent disconnect does not cancel an on-chain mandate.
 
-Report purchase completion only when the original purchase is `succeeded` with an `order_id`. An on-chain payment alone is not merchant fulfillment. Resolve `needs_attention` through the original purchase ID and receipt evidence.
+Report purchase completion only when the original purchase is `succeeded` with an `order_id`. An on-chain payment alone is not merchant fulfillment. Active purchases continue automatically on the server: follow status_detail and next_poll_after_seconds. Explorer confirmations can precede Ethereum finality. Never send a replacement payment while waiting. Resolve `needs_attention` through the original purchase ID and receipt evidence.
 
 ## Hyperliquid trading
 

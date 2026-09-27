@@ -1,6 +1,6 @@
 # OurPay Wallet plugin
 
-Connect an AI agent to the owner's existing OurPay account wallet. SDK 0.10.0 includes **57 MCP tools** for wallet discovery, funding, transfers, conversions, merchant purchases, simulated EVM calls, signatures, app connections and Hyperliquid trading. Agents never receive the recovery phrase.
+Connect an AI agent to the owner's existing OurPay account wallet. SDK 0.11.0 includes **57 MCP tools** for wallet discovery, funding, transfers, conversions, merchant purchases, simulated EVM calls, signatures, app connections and Hyperliquid trading. Agents never receive the recovery phrase.
 
 [Open wallet](https://wallet.ourpay.dev/wallet) · [Download packages](https://wallet.ourpay.dev/agents) · [Public repository](https://github.com/Ourpay/ourpay-wallet)
 

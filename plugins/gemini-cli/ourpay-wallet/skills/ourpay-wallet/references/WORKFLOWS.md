@@ -116,7 +116,34 @@ A 20-USDC total task budget is not permission to spend 20 USDC on goods plus unl
 
 A chain payment, `awaiting_payment` or merchant payment acknowledgment alone does not establish fulfillment. If a purchase has a payment transaction and needs attention, re-executing the original purchase ID reconciles that payment and receipt; it does not send a replacement. This receipt check can run while spending is paused.
 
-Discovery covers OurPay merchants and their supported payment methods. Opening a subscription listing does not start a subscription or add recurring crypto billing support. OurPay order success is the platform's canonical fulfillment result; carrier delivery and third-party access should be reported only when separately evidenced.
+Active purchases continue on the server after a tool returns. Follow `status_detail` and `next_poll_after_seconds` on the same purchase ID. Ethereum merchant settlement waits for a canonical finalized block; an explorer's successful receipt and confirmation count can appear earlier. No extra user confirmation is needed after execution is authorized. Temporary provider failures retry automatically and retain the original transaction. Do not pay again while settlement is pending.
+
+Discovery covers OurPay merchants and their supported payment methods. OurPay order success is the platform's canonical fulfillment result; carrier delivery and third-party access should be reported only when separately evidenced.
+
+### Buy a recurring USDC subscription
+
+Version 0.11.0 extends the existing purchase tools. Read `payment_collection.instructions` from `ourpay_prepare_checkout` or `ourpay_checkout`. Choose an instruction with `subscription` terms on a configured wallet network. A recurring product listing alone is insufficient.
+
+Pass its exact cadence and payment count as `recurring` to `ourpay_wallet_quote_purchase`. Convert the instruction's human-unit `maximum_amount` into six-decimal USDC base units. For example, a maximum 20 USDC monthly payment with two total payments requires:
+
+```json
+{
+  "recurring": {
+    "maximum_amount": "20000000",
+    "maximum_payments": 2,
+    "interval": "month",
+    "interval_count": 1
+  }
+}
+```
+
+Use the actual returned terms, not this example. Standard mode reviews the complete mandate before execution; Risky mode still requires the agent to act within the user's instructions. The backend binds the token, chain, contract, executor, recipient, deadline, cadence and cap. It verifies the deployed contract and rechecks instructions before broadcasting. Missing or changed terms are rejected.
+
+Execution grants a finite ERC-20 allowance when needed, then authorizes the mandate and first charge. The initial shared spending reservation covers `maximum_amount × maximum_payments` plus two destination transaction fee caps. Existing higher allowances are not reduced. `max_from_amount` bounds the first payment's funding/conversion; it is not the lifetime subscription authorization. Approval and authorization are grouped under the purchase in Activity.
+
+Wait for `succeeded`, `order_id` and `subscription_id`. The existing subscription executor processes subsequent billing cycles exactly once within the on-chain mandate. Renewal requires enough native USDC and allowance on that same network; automatic renewal conversion from other assets/chains is not implemented. The executor supplies renewal gas. Cancel through the existing subscription/customer-portal flow or revoke the on-chain allowance to stop future pulls. Pausing the wallet or disconnecting an agent does not cancel an already-authorized on-chain subscription.
+
+The configured production recurring rail is Polygon native USDC, with two total payments per mandate as of 2026-09-27. One-time USDC support on Ethereum or other networks does not imply recurring support there. Local tests cover first charge, renewal, cancellation, owner approval, budget rejection and duplicate protection; they do not establish a new live renewal.
 
 ## Trade on Hyperliquid
 

@@ -80,7 +80,13 @@ The agent searches the public OurPay product index, opens candidate checkout det
 
 Preparing a checkout creates an unpaid invoice. Payment still uses the wallet's quote, conversion, approval and settlement checks. Only a successful purchase with an `order_id` establishes completion. Physical shipping and other fulfillment details must be available through the merchant's supported checkout; the agent cannot invent them or assume a delivery integration exists.
 
-The index covers eligible OurPay merchants. It does not make arbitrary Amazon, Shopify, bank, UPI or card checkouts automatically payable. A subscription listing does not by itself authorize or implement future recurring crypto charges.
+The index covers eligible OurPay merchants. It does not make arbitrary Amazon, Shopify, bank, UPI or card checkouts automatically payable.
+
+After you authorize a purchase, OurPay confirms it automatically. Ethereum can show a successful transaction before its block is finalized for merchant settlement. Keep the original purchase; do not pay again. Activity shows automatic confirmation in progress, and the agent can poll the same purchase ID.
+
+Account owners receive a “Payment submitted” tracking email after broadcast, followed by the merchant order confirmation after verified settlement and fulfillment. The early email is not a receipt or proof of delivery. Email-provider or inbox delays are still possible.
+
+Agents can also buy supported recurring USDC subscriptions. The checkout states the maximum charge, billing interval and finite payment count; Standard mode asks you to approve these terms together. The configured recurring network is Polygon native USDC, currently limited to two payments per mandate. The first charge can use the wallet's supported conversion flow, but future renewals need USDC available on the selected network. Cancel the subscription through its customer portal to stop renewal: pausing your wallet or disconnecting the agent does not cancel a mandate you already authorized. [Recurring purchase details](WORKFLOWS.md#buy-a-recurring-usdc-subscription).
 
 ## Trade with an agent
 

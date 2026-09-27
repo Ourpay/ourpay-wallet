@@ -4,7 +4,7 @@ Start with the exact symptom, host, connector URL, SDK version if local, and ori
 
 ## The agent sees 44, 45, 47 or 51 tools
 
-SDK 0.10.0 defines **57 tools**. The additional usage guide is `ourpay_wallet_guide`; product discovery is `ourpay_wallet_search_products`. Hosts may rename or prefix display labels, filter tools or return only search matches rather than the complete catalog.
+SDK 0.11.0 defines **57 tools**. The additional usage guide is `ourpay_wallet_guide`; product discovery is `ourpay_wallet_search_products`. Hosts may rename or prefix display labels, filter tools or return only search matches rather than the complete catalog.
 
 1. Confirm that the remote URL is `https://mcp.ourpay.dev/wallet/mcp`. `/mcp` is the merchant service; the old standalone Render URL is a compatibility endpoint.
 2. Ask for a fresh MCP `tools/list`, including pagination if the host exposes it. Restart/reload the host's MCP connection or start a fresh agent session if it cached schemas.
@@ -105,6 +105,16 @@ The supported signing flow can help the connected site request a withdrawal, but
 Search finds eligible public OurPay products by keywords, not arbitrary internet merchants or semantic inventory matches. Open each candidate's returned checkout URL for current details. An unpaid checkout or prepared invoice is not a purchase. A recurring listing does not establish recurring crypto payment support.
 
 Missing buyer details, unsupported merchant payment methods, expired invoices and changed totals need resolution before execution. Preserve the checkout secret privately and reuse the original purchase ID. Confirm `succeeded` plus `order_id`; then distinguish platform fulfillment from any separately verified shipping or external delivery.
+
+## Explorer says success but the purchase is still confirming
+
+An explorer receipt establishes inclusion. Ethereum merchant settlement additionally waits for a canonical finalized block and then creates the merchant order. Wallet transfer confirmation can occur earlier. `paying` and `awaiting_payment` continue automatically on the server; no additional owner confirmation is required. Poll the original purchase ID using `next_poll_after_seconds` and read `status_detail`. A transient RPC failure is retried with the same payment. Do not create another checkout or payment to accelerate finality.
+
+The account owner receives a submission email once the payment is broadcast; the final order email waits for verified fulfillment. Compare transaction broadcast, order creation and the email log's provider-accepted timestamp to locate delays. Provider acceptance is not proof of inbox delivery. A durable purchase marker prevents repeated settlement polls from queuing the submission email again; provider delivery retries can still be uncertain.
+
+For `needs_attention`, inspect the original transaction and failure reason. A settled transaction can be reconciled by executing the same purchase ID; it is never replaced automatically. Only `succeeded` with an `order_id` establishes completion.
+
+For recurring purchases, missing or mismatched `recurring` terms must be corrected from the prepared checkout's `payment_collection.instructions`. Update local plugins to 0.11.0 and refresh hosted schemas to expose this field. A stopped renewal may need USDC or restored allowance on the mandate's network; the wallet does not automatically convert cross-chain holdings for later cycles.
 
 ## What to include in a bug report
 

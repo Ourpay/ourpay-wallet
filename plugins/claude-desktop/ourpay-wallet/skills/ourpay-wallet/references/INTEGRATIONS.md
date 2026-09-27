@@ -1,6 +1,6 @@
 # OurPay Wallet integrations
 
-Connect one account-owned wallet through hosted OAuth MCP, a local plugin or a model/framework adapter. SDK **0.10.0** exposes **57 tools**, including `ourpay_wallet_guide`, product search and fifteen Hyperliquid/data/runner tools. The same schemas are used across distributions; enabled operations still depend on the deployed backend and owner permissions.
+Connect one account-owned wallet through hosted OAuth MCP, a local plugin or a model/framework adapter. SDK **0.11.0** exposes **57 tools**, including `ourpay_wallet_guide`, product search and fifteen Hyperliquid/data/runner tools. The same schemas are used across distributions; enabled operations still depend on the deployed backend and owner permissions.
 
 This release includes six native packages, 18 local client profiles (17 named clients and a generic profile), ten hosted configuration profiles, five model tool-call formats and four framework examples. Models must support tools and the host must permit external integrations. A closed chat app cannot install arbitrary tools just because its model supports function calling.
 
@@ -8,7 +8,7 @@ This release includes six native packages, 18 local client profiles (17 named cl
 
 ## Download and configure
 
-Download from [OurPay integrations](https://wallet.ourpay.dev/agents). Use the complete `ourpay-wallet-integrations-0.10.0.zip`, or a native package for your host. Extract to a permanent location and use Node 24+. The archive includes its runtime dependencies. There is no published npm package to install with `npx @ourpay/agent-wallets`.
+Download from [OurPay integrations](https://wallet.ourpay.dev/agents). Use the complete `ourpay-wallet-integrations-0.11.0.zip`, or a native package for your host. Extract to a permanent location and use Node 24+. The archive includes its runtime dependencies. There is no published npm package to install with `npx @ourpay/agent-wallets`.
 
 From the extracted `ourpay-wallet` directory:
 
@@ -28,12 +28,12 @@ The generator resolves the current Node executable and bundle to absolute paths.
 
 | Host | Package | Install |
 | --- | --- | --- |
-| Codex | `ourpay-wallet-codex-0.10.0.zip` | Personal/team plugin marketplace, or the generated Codex MCP configuration |
-| Claude Code | `ourpay-wallet-claude-code-0.10.0.zip` | `claude --plugin-dir /absolute/path/ourpay-wallet` |
-| Cursor | `ourpay-wallet-cursor-0.10.0.zip` | Copy into `~/.cursor/plugins/local/ourpay-wallet`, then reload |
-| Gemini CLI | `ourpay-wallet-gemini-cli-0.10.0.zip` | `gemini extensions install /absolute/path/ourpay-wallet` |
-| GitHub Copilot CLI | `ourpay-wallet-copilot-cli-0.10.0.zip` | `copilot plugin install /absolute/path/ourpay-wallet` |
-| Claude Desktop | `ourpay-wallet-claude-desktop-0.10.0.mcpb` | Open the bundle; requires a Node 24+ runtime |
+| Codex | `ourpay-wallet-codex-0.11.0.zip` | Personal/team plugin marketplace, or the generated Codex MCP configuration |
+| Claude Code | `ourpay-wallet-claude-code-0.11.0.zip` | `claude --plugin-dir /absolute/path/ourpay-wallet` |
+| Cursor | `ourpay-wallet-cursor-0.11.0.zip` | Copy into `~/.cursor/plugins/local/ourpay-wallet`, then reload |
+| Gemini CLI | `ourpay-wallet-gemini-cli-0.11.0.zip` | `gemini extensions install /absolute/path/ourpay-wallet` |
+| GitHub Copilot CLI | `ourpay-wallet-copilot-cli-0.11.0.zip` | `copilot plugin install /absolute/path/ourpay-wallet` |
+| Claude Desktop | `ourpay-wallet-claude-desktop-0.11.0.mcpb` | Open the bundle; requires a Node 24+ runtime |
 
 Claude Desktop's managed Node version may differ from your system Node. If it cannot meet the runtime requirement, use the `claude-desktop` profile with your external Node 24 executable. Organization policies may limit local plugins. Packages are ready for local distribution; this does not imply public marketplace listing or vendor approval.
 
@@ -162,7 +162,7 @@ Ask: “Call `ourpay_wallet_guide` with topic `hyperliquid`, then read my wallet
 
 1. Choose one connection method per intended grant. Installing both a native package and a remote connector can create duplicate-looking app sessions; it does not create more funds.
 2. For hosted OAuth, keep the canonical URL and existing authorization, then refresh the host's tool discovery. For local stdio, upgrade the bundle and restart the MCP process. A hosted deployment cannot update a local executable.
-3. Request a fresh catalog. SDK 0.10.0 contains 57 tools: 54 wallet tools and three checkout tools. Search results or a host-filtered subset can contain fewer.
+3. Request a fresh catalog. SDK 0.11.0 contains 57 tools: 54 wallet tools and three checkout tools. Search results or a host-filtered subset can contain fewer.
 4. Call `ourpay_wallet_guide` with `{"topic":"overview"}`, then read `ourpay_wallet`. Check the expected wallet identity and active settings. Do not execute a financial action just to check installation.
 5. If a tool is missing, inspect endpoint, local bundle path/version, host filters and catalog cache. Operators must deploy the shared `ourpay-mcp` service, not just the legacy `ourpay-wallet-mcp` service. See [troubleshooting](TROUBLESHOOTING.md#the-agent-sees-44-45-47-or-51-tools).
 

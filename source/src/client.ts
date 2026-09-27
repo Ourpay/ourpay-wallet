@@ -105,6 +105,14 @@ export interface PurchaseRequest {
   max_network_fee: string
   max_native_value?: string
   max_destination_network_fee: string
+  recurring?: RecurringConsent
+}
+
+export interface RecurringConsent {
+  maximum_amount: string
+  maximum_payments: number
+  interval: 'day' | 'week' | 'month' | 'year'
+  interval_count: number
 }
 
 export interface Purchase {
@@ -121,6 +129,11 @@ export interface Purchase {
   transaction_id: string | null
   order_id: string | null
   failure_reason: string | null
+  recurring_terms?: (RecurringConsent & { contract_address: string; executor: string; code_hash: string; deadline: string }) | null
+  approval_transaction_id?: string | null
+  subscription_id?: string | null
+  status_detail?: string
+  next_poll_after_seconds?: number | null
 }
 
 export interface CheckoutDetails {
@@ -140,6 +153,22 @@ export interface Checkout {
   payment_processor: string
   product_id: string | null
   product: { id: string; name: string; description: string | null; medias: Array<{ public_url: string }> } | null
+  payment_collection?: CheckoutPaymentCollection
+}
+
+export interface CheckoutPaymentCollection {
+  id: string
+  status: string
+  expires_at: string
+  instructions: Array<{
+    id: string
+    asset: string
+    network: string
+    amount: string
+    address: string | null
+    network_info: { chain_id: string | null; token_address: string; family: 'evm' | 'solana' } | null
+    subscription: (Omit<RecurringConsent, 'maximum_amount'> & { maximum_amount: string; contract_address: string }) | null
+  }>
 }
 
 export class WalletAPIError extends Error {
@@ -353,13 +382,20 @@ export class AgentWalletClient {
     }
     return this.request(url.pathname, 'POST', undefined, false, '')
   }
-  checkout(secret: string): Promise<Checkout> {
-    return this.request(`/client/${encodeURIComponent(secret)}`, 'GET', undefined, false, '/v1/checkouts')
+  async checkout(secret: string): Promise<Checkout> {
+    const checkout = await this.request<Checkout>(`/client/${encodeURIComponent(secret)}`, 'GET', undefined, false, '/v1/checkouts')
+    return this.withPaymentCollection(secret, checkout)
   }
   async prepareCheckout(secret: string, details: CheckoutDetails): Promise<Checkout> {
     const checkout = await this.checkout(secret)
     if (checkout.status === 'succeeded') throw new WalletAPIError(409, 'This checkout is already paid. Do not pay again.')
     if (checkout.status === 'confirmed' && checkout.payment_processor === 'bitcart') return checkout
-    return this.request(`/client/${encodeURIComponent(secret)}/confirm`, 'POST', { ...details, payment_processor: 'bitcart', payment_method_type: 'crypto' }, false, '/v1/checkouts')
+    const prepared = await this.request<Checkout>(`/client/${encodeURIComponent(secret)}/confirm`, 'POST', { ...details, payment_processor: 'bitcart', payment_method_type: 'crypto' }, false, '/v1/checkouts')
+    return this.withPaymentCollection(secret, prepared)
+  }
+  private async withPaymentCollection(secret: string, checkout: Checkout): Promise<Checkout> {
+    if (checkout.status !== 'confirmed' || checkout.payment_processor !== 'bitcart') return checkout
+    const payment_collection = await this.request<CheckoutPaymentCollection>(`/client/${encodeURIComponent(secret)}`, 'GET', undefined, false, '/v1/payment-collections')
+    return { ...checkout, payment_collection }
   }
 }

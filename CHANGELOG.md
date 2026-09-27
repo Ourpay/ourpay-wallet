@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.0 — 2026-09-27
+
+- Buy bounded recurring USDC subscriptions through the existing checkout and purchase tools, with explicit per-payment limits, cadence and payment count.
+- Prepared checkouts include canonical payment instructions. Subscription quotes reserve the complete mandate cap; approval and authorization use durable retry IDs.
+- Purchase progress explains automatic settlement and finality, includes a recommended polling interval, and clears recovered provider errors.
+- Account owners receive a payment-submitted tracking email before final settlement; the order confirmation remains tied to verified fulfillment.
+- Wallet activity groups allowance and subscription authorization, and owner review displays the recurring commitment. The tool count remains 57.
+- Renewal conversion is not automatic. Cancel an authorized subscription separately from pausing the wallet or disconnecting an agent.
+
 ## 0.10.0 — 2026-09-27
 
 - Five new tools bring the catalog to 57: shared exchange updates and create/list/read/control persistent trading plans.

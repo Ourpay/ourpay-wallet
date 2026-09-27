@@ -38,7 +38,7 @@ Then ask:
 
 > Call `ourpay_wallet_guide` with topic `overview`, then read my wallet and supported networks. Do not submit any payment, signature or trade.
 
-The guide provides task-specific instructions. A fresh 0.10.0 catalog has **57 tools**: three checkout tools and 54 wallet tools. Restart a host that cached an older catalog; update the executable as well if using a local package. An ordinary tool update does not require a new wallet. [Refresh and troubleshooting](TROUBLESHOOTING.md).
+The guide provides task-specific instructions. A fresh 0.11.0 catalog has **57 tools**: three checkout tools and 54 wallet tools. Purchase tools support bounded USDC subscriptions with explicit recurring consent and automatic settlement progress. Restart a host that cached an older schema; update the executable as well if using a local package. An ordinary tool update does not require a new wallet. [Refresh and troubleshooting](TROUBLESHOOTING.md).
 
 ## Install in coding agents
 
