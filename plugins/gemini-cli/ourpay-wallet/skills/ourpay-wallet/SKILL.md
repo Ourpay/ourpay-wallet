@@ -69,9 +69,9 @@ Report purchase completion only when the original purchase is `succeeded` with a
 
 Read exchange capabilities, discover markets with pagination, and inspect account state for the environment and returned `dex`. Discover all relevant spot/default/HIP-3 markets; do not assume only BTC or USDC pairs exist. HyperCore exchange balances are distinct from HyperEVM HYPE and on-chain USDC. Resolve the location intended by a HYPE request instead of substituting an asset by ticker.
 
-Combine market snapshots with account collateral, positions, open orders and fills. Inspect timestamps, candle `closed` flags and section `errors`; missing fields are unknown. Read `order_constraints`, allowed margin modes, maximum leverage, quote valuation and account `fee_schedule`. Decimal fee rates are not percentages. A tool snapshot is not the frontend's live WebSocket feed or a scheduled strategy.
+Combine market snapshots with account collateral, positions, open orders and fills. Inspect timestamps, candle `closed` flags and section `errors`; missing fields are unknown. Read `order_constraints`, allowed margin modes, maximum leverage, quote valuation and account `fee_schedule`. Decimal fee rates are not percentages. Use exchange_updates for shared, cursor-based updates and runner tools for an explicitly authorized continuous fixed plan. Snapshot reads alone do not start either.
 
-Supported orders are GTC limit, ALO post-only and price-bounded IOC; partial fills are possible. Perpetuals default to isolated margin. Request cross margin explicitly only when supported and authorized. Reduce-only exits cannot increase or flip a position. Stop/trigger orders and automatic repricing are not implemented.
+Supported orders are GTC limit, ALO post-only and price-bounded IOC; partial fills are possible. Perpetuals default to isolated margin. Request cross margin explicitly only when supported and authorized. Reduce-only exits cannot increase or flip a position. For perpetual stop-loss/take-profit orders use trigger kind sl/tp and price, with market or limit execution and reduce_only for exits. Independent triggers are not an OCO bracket. Triggered is not proof of a fill. Automatic repricing is not implemented.
 
 `ourpay_wallet_place_orders` accepts up to ten independent concurrent intents. Partial acceptance is possible. Save and inspect every UUID/result; same-market leverage conflicts or uncertain submissions can block another entry. Preserve the original IDs across retries. Cancel and verify the original before replacing/repricing it.
 
@@ -104,3 +104,9 @@ Disconnecting an app or agent prevents new authorization; previously issued sign
 | Exchange trade/cancel | Venue state, actual fills and confirmed cancellation where applicable |
 
 Do not treat tool success, quote creation, owner approval, `submitted`, `broadcast` or `needs_attention` as final economic success. Report the original operation and what remains unverified. Use [troubleshooting](references/TROUBLESHOOTING.md) for a bounded next step.
+
+## Shared data and continuous plans
+
+Use `ourpay_wallet_exchange_updates` with selected exact market IDs and the returned cursor. Treat stale/unavailable data as unknown. One shared public feed serves all wallets; private account data stays scoped. A tool call returns once and cannot wake an idle chat. See [TRADING.md](references/TRADING.md).
+
+For an explicit ongoing-trading request, `ourpay_wallet_create_runner` stores a fixed-size interval/price-condition plan on OurPay. Require maximum attempts and a lifetime reference-notional budget. Normal mode still asks the owner to approve every order; do not enable Risky mode yourself. Inspect status with `ourpay_wallet_runner`, and pause/stop with `ourpay_wallet_control_runner`. Revocation, pause and expiry prevent new attempts and request cancellation; they never close filled positions. Keep original IDs after an uncertain result. Do not claim this is discretionary AI inference, HFT, an OCO bracket, or a guarantee of execution/profit.

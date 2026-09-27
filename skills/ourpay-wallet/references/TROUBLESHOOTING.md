@@ -4,7 +4,7 @@ Start with the exact symptom, host, connector URL, SDK version if local, and ori
 
 ## The agent sees 44, 45, 47 or 51 tools
 
-SDK 0.9.6 defines **52 tools**. The additional usage guide is `ourpay_wallet_guide`; product discovery is `ourpay_wallet_search_products`. Hosts may rename or prefix display labels, filter tools or return only search matches rather than the complete catalog.
+SDK 0.10.0 defines **57 tools**. The additional usage guide is `ourpay_wallet_guide`; product discovery is `ourpay_wallet_search_products`. Hosts may rename or prefix display labels, filter tools or return only search matches rather than the complete catalog.
 
 1. Confirm that the remote URL is `https://mcp.ourpay.dev/wallet/mcp`. `/mcp` is the merchant service; the old standalone Render URL is a compatibility endpoint.
 2. Ask for a fresh MCP `tools/list`, including pagination if the host exposes it. Restart/reload the host's MCP connection or start a fresh agent session if it cached schemas.
@@ -111,3 +111,12 @@ Missing buyer details, unsupported merchant payment methods, expired invoices an
 Provide the host and version, sanitized endpoint path, UTC timestamp, tool name, network/market, expected result, observed status/error code, and original OurPay operation ID. Public transaction hashes can help reconcile chain state. Include the exact installed release/commit and whether the failure occurred in Standard or Risky mode.
 
 Exclude seed/private keys, access/refresh tokens, local connection JSON, WalletConnect pairing URIs, checkout secrets and unrelated personal data. For an uncertain monetary action, describe the original operation before anyone retries it.
+
+## Shared feed and trading plans
+
+- `reset=true`: discard selected-market local state, apply the returned snapshot and resume with the new cursor. The retained stream is short; it is not a historical tick archive.
+- `stale_markets` or `unavailable_markets`: do not replace missing data with zero. The runner waits for fresh data and retries at its interval. Check API feed leadership and Redis before restarting a plan.
+- A chat has stopped receiving data: tool calls cannot wake idle ChatGPT/Claude conversations. Use SDK `watchExchange` in a running host, or a bounded OurPay runner for previously submitted decisions.
+- Plan active but no trade: inspect next check, condition, account collateral, owner approvals, last error, attempt cap and reference-notional budget. Active means scheduled.
+- Plan paused with uncertain order: reconcile the original order ID. Do not create another plan to retry that order. Resume only after the original outcome is known and ongoing authorization remains.
+- Stop order triggered but no fill: check venue status and actual fills. A triggered limit can rest unfilled; a market-trigger IOC can partially fill. Cancellation and a trigger racing each other can result in execution before cancellation.

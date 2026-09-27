@@ -162,3 +162,7 @@ Read-only `ourpay_wallet_rpc` is for supported balances, contract views, logs an
 Keep an application journal of request UUID, full intent, approval ID, resource ID, original transaction/venue IDs and last observed state. Bound polling and honor provider errors. After a timeout, read the original resource; for retries keep its UUID and inputs. Changed economic intent needs a distinct deliberate request after resolving the previous one.
 
 When an action is unsupported, a quote expires, an owner rejects a request or execution remains uncertain, report that exact boundary and what is needed. Do not silently increase fees, weaken minimum output, change networks or widen authority to manufacture success.
+
+## Continuous trading and native exits
+
+Read [TRADING.md](TRADING.md) before starting an ongoing plan. Use `exchange_updates` for fresh filtered data, native `trigger` fields for perpetual SL/TP orders, and `create_runner` for bounded server-run fixed decisions. Keep exact IDs across retries; reconcile fills before replacing or canceling siblings. A connected chat is not an always-on model host.

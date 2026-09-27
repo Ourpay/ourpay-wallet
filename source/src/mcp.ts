@@ -1,3 +1,4 @@
+import { registerRunnerTools } from './runner-tools.js'
 import { registerGuideTool, walletInstructions } from './guide.js'
 import { readOnly, spending } from './tool-support.js'
 import { McpServer } from '@modelcontextprotocol/server'
@@ -22,7 +23,7 @@ const conversionInput = z.object({
 
 export function createWalletMCP(client: AgentWalletClient, options: { provision?: boolean } = {}): McpServer {
   const server = new McpServer({
-    name: 'OurPay Wallet', title: 'OurPay Wallet', version: '0.9.6',
+    name: 'OurPay Wallet', title: 'OurPay Wallet', version: '0.10.0',
     websiteUrl: 'https://wallet.ourpay.dev/agents',
     icons: [{ src: 'https://wallet.ourpay.dev/ourpay-wallet-logo.png', mimeType: 'image/png', sizes: ['512x512'] }],
   }, { instructions: walletInstructions })
@@ -127,6 +128,7 @@ export function createWalletMCP(client: AgentWalletClient, options: { provision?
   registerTradeTools(server, client, result)
   registerSignatureTools(server, client, result)
   registerExchangeTools(server, client, result)
+  registerRunnerTools(server, client, result)
   registerDappTools(server, client, result)
   registerFundingTools(server, client, result)
   return server

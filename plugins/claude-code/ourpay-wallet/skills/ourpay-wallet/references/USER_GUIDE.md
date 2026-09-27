@@ -88,7 +88,7 @@ For on-chain swaps, the agent discovers the exact token and network, quotes the 
 
 For Hyperliquid, the agent can discover spot and perpetual markets, including supported builder-deployed markets, inspect prices, order books, candles, fees, positions and collateral, and place supported orders within your instructions. The toolset supports isolated or supported cross margin, leverage within venue limits, standing limit orders, post-only orders, price-bounded immediate-or-cancel orders, reduce-only exits and independently tracked concurrent orders.
 
-This is not a promise of profit, low-latency trading or continuous strategy execution. The agent host must remain running or provide its own scheduler. Stop/trigger orders and automatic repricing are not implemented as complete OurPay flows. [Hyperliquid details](PROTOCOLS.md#exchange-trading-hyperliquid).
+For continuous operation, ask your agent to create a bounded persistent trading plan with a maximum number of attempts and a reference-notional budget. OurPay runs the fixed plan after the chat closes; normal mode still requires each order approval. Native stop-loss/take-profit orders rest at Hyperliquid. An agent making new discretionary decisions needs its own persistent host. Neither path promises profit or high-frequency execution; automatic repricing and atomic OCO brackets are not implemented. [Hyperliquid details](PROTOCOLS.md#exchange-trading-hyperliquid).
 
 ## Open your wallet in Hyperliquid
 

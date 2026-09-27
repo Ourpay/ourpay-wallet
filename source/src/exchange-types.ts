@@ -47,6 +47,7 @@ export interface ExchangeOrderRequest {
   size: string; limit_price: string; expires_at?: string | null
   order_type?: 'limit' | 'market'; time_in_force?: 'Gtc' | 'Alo'
   reduce_only?: boolean; leverage?: number; margin_mode?: 'isolated' | 'cross'
+  trigger?: { price: string; kind: 'sl' | 'tp' } | null
 }
 
 export interface ExchangeOrder {

@@ -1,3 +1,5 @@
+import type { MarketUpdates, TradingRunner, TradingRunnerRequest } from './runner-types.js'
+export type * from './runner-types.js'
 import type { CallBatch, CallCapabilities, ExecuteCalls } from './call-types.js'
 import type { Trade, TradeRequest, TradingCapabilities } from './trade-types.js'
 import type { SignatureRequest, WalletSignature } from './signature-tools.js'
@@ -247,6 +249,26 @@ export class AgentWalletClient {
   }
 
   approval(id: string) { return this.request<WalletApproval>(`/me/approvals/${encodeURIComponent(id)}`) }
+  exchangeUpdates(network: ExchangeNetwork, markets: string[], after?: string, waitSeconds = 0): Promise<MarketUpdates> {
+    const query = new URLSearchParams({ network, wait_seconds: String(waitSeconds) })
+    for (const market of markets) query.append('markets', market)
+    if (after) query.set('after', after)
+    return this.request(`/me/exchange/updates?${query}`)
+  }
+  async *watchExchange(network: ExchangeNetwork, markets: string[], signal?: AbortSignal): AsyncGenerator<MarketUpdates> {
+    let cursor: string | undefined
+    while (!signal?.aborted) {
+      const update = await this.exchangeUpdates(network, markets, cursor, cursor ? 25 : 0)
+      cursor = update.cursor
+      if (signal?.aborted) return
+      yield update
+      if (update.reset && !update.updates.length) await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+  }
+  createRunner(data: TradingRunnerRequest): Promise<TradingRunner> { return this.request('/me/exchange/runners', 'POST', data) }
+  runners(): Promise<TradingRunner[]> { return this.request('/me/exchange/runners') }
+  runner(id: string): Promise<TradingRunner> { return this.request(`/me/exchange/runners/${encodeURIComponent(id)}`) }
+  controlRunner(id: string, action: 'pause' | 'resume' | 'stop'): Promise<TradingRunner> { return this.request(`/me/exchange/runners/${encodeURIComponent(id)}/${action}`, 'POST') }
   exchangeCapabilities(): Promise<ExchangeCapabilities> { return this.request('/me/exchange/capabilities') }
   exchangeMarkets(network: ExchangeNetwork, search = '', limit = 100, offset = 0): Promise<ExchangeMarket[]> { return this.request(`/me/exchange/markets?${new URLSearchParams({ network, search, limit: String(limit), offset: String(offset) })}`) }
   exchangeAccount(network: ExchangeNetwork, dex = ''): Promise<ExchangeAccount> { return this.request(`/me/exchange/account?${new URLSearchParams({ network, dex })}`) }

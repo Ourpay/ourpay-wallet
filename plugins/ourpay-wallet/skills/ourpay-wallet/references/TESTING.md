@@ -86,3 +86,16 @@ No real funds, new mainnet orders, changed wallet permissions or recovery phrase
 | Recovery after interruption | Retry the same UUID/resource, establish the original outcome and prove no duplicate payment/order |
 
 Use dedicated test accounts and explicitly authorized amounts for monetary checks. Start with read-only discovery and local/testnet execution. A funded mainnet test needs a concrete budget, fee/slippage ceiling, recipient/market and expected result; a documentation or release check does not authorize one.
+
+## 0.10.0 verification — 2026-09-27
+
+| Area | Observed result | Scope |
+| --- | --- | --- |
+| Exchange, runners, feed, collection and fees | 240 tests passed; 6 skipped | DB/Redis plus provider fixtures, includes native trigger wire validation, approval/revocation, rollback and deduplication |
+| Crypto subscriptions | 41 tests passed against isolated Anvil chains | Real local token authorization, renewal, cancellation, allowance/balance failures and multiple deployment selection; no mainnet charge |
+| Subscription contract | 15 tests passed, including two 512-case fuzz tests | Local Solidity execution |
+| SDK/MCP packages | 37 passed; 4 skipped | 57 tools, exact trigger/runner inputs, retry identity and six native bundles; external live integration tests remain separate |
+| Frontend | Typecheck passed | Runner controls and shared-price feed integration |
+| Polygon subscription readiness | Passed at block 94533675 | Exact deployed runtime, token, recipient, executor, unpaused state and gas; production cap is two payments per mandate |
+
+Native trigger fills and cancellations have not been demonstrated on a newly funded venue account in this release. Passing local/testnet tests does not guarantee mainnet execution, profitability, liquidity or fees. No user funds were moved during this release verification. Live deployment and delivery benchmark results are recorded separately after rollout.

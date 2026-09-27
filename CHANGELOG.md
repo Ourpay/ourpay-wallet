@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.10.0 — 2026-09-27
+
+- Five new tools bring the catalog to 57: shared exchange updates and create/list/read/control persistent trading plans.
+- Native perpetual stop-loss/take-profit market and limit orders, with reduce-only exits and reconciliation that distinguishes triggering from filling.
+- One server feed per exchange environment, shared public REST cache, coalesced filtered updates, cursor resets and explicit stale data.
+- Durable bounded plans continue on OurPay workers after a chat closes. Owner approvals and original connection permissions still apply.
+- Wallet Trade screen shows persistent-plan status and pause/stop controls. Public data and private account reads remain separate.
+- Deployment, billing, architecture, workflow and test documentation updated. Recurring USDC uses bounded on-chain mandates; INR fee is 5% without a fixed component.
+
+
 ## Documentation update — September 27, 2026
 
 - Add an owner guide covering wallet screens, funding, permissions, recovery and Hyperliquid website connection.

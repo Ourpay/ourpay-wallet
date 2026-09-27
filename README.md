@@ -4,7 +4,7 @@
 
 One account-owned crypto wallet for you and your authorized AI agents. Sign in to the same OurPay account from ChatGPT, Claude, a coding agent or a compatible application to use the same wallet, with separately revocable connections.
 
-**52 tools · 6 native packages · 18 client profiles · 5 model tool formats · 4 framework examples**
+**57 tools · 6 native packages · 18 client profiles · 5 model tool formats · 4 framework examples**
 
 [Open wallet](https://wallet.ourpay.dev/wallet) · [Connect an agent](https://wallet.ourpay.dev/agents) · [Release downloads](https://github.com/Ourpay/ourpay-wallet/releases/latest) · [All tools](TOOLS.md)
 
@@ -18,10 +18,11 @@ One account-owned crypto wallet for you and your authorized AI agents. Sign in t
 | Funding | Discover native USDC and quote gas, destination USDC or mainnet Hyperliquid collateral funding; continue multi-leg routes using actual received amounts |
 | Merchant purchases | Search eligible OurPay products, open candidate checkouts, inspect details, prepare crypto invoices, quote/convert/pay and track the canonical order |
 | EVM applications | Simulated sequential contract calls, personal/EIP-712 signatures, app grants, read-only RPC, an Ethereum provider and WalletConnect adapter |
-| Hyperliquid | Spot/default/HIP-3 market discovery, book/candle/trade snapshots, account and fee data, isolated or supported cross margin, leverage, GTC/ALO/IOC orders, concurrent independent orders, cancellation and fills |
+| Shared data and plans | Shared market feed, cursor/long-poll updates and server-run bounded trading plans; see [TRADING.md](TRADING.md) |
+| Hyperliquid | Spot/default/HIP-3 market discovery, book/candle/trade snapshots, account and fee data, isolated or supported cross margin, leverage, GTC/ALO/IOC and native perpetual stop-loss/take-profit orders, concurrent independent orders, cancellation and fills |
 | Owner control | Standard-mode action approval with email review links, shared daily allowance, owner-enabled Risky mode, pause and disconnect |
 
-Availability depends on enabled networks, exact assets/markets, liquidity, provider/venue state and owner permissions. General wallet signing is not a complete integration with every dApp. The wallet does not include a continuous strategy scheduler, complete Polymarket trading adapter, arbitrary internet checkout adapter or fiat/card/UPI payments. [Full capability boundaries](PROTOCOLS.md).
+Availability depends on enabled networks, exact assets/markets, liquidity, provider/venue state and owner permissions. General wallet signing is not a complete integration with every dApp. Persistent plans execute bounded instructions; they do not host an LLM that invents or revises strategies. Complete Polymarket trading, arbitrary internet checkout and fiat/card/UPI payments remain outside the wallet. [Full capability boundaries](PROTOCOLS.md).
 
 ## Connect with OAuth
 
@@ -37,7 +38,7 @@ Then ask:
 
 > Call `ourpay_wallet_guide` with topic `overview`, then read my wallet and supported networks. Do not submit any payment, signature or trade.
 
-The guide provides task-specific instructions. A fresh 0.9.6 catalog has **52 tools**: three checkout tools and 49 wallet tools. Restart a host that cached an older catalog; update the executable as well if using a local package. An ordinary tool update does not require a new wallet. [Refresh and troubleshooting](TROUBLESHOOTING.md).
+The guide provides task-specific instructions. A fresh 0.10.0 catalog has **57 tools**: three checkout tools and 54 wallet tools. Restart a host that cached an older catalog; update the executable as well if using a local package. An ordinary tool update does not require a new wallet. [Refresh and troubleshooting](TROUBLESHOOTING.md).
 
 ## Install in coding agents
 
@@ -114,7 +115,7 @@ Save the initial recovery phrase privately. You can reveal it later in wallet Se
 | [INTEGRATIONS.md](INTEGRATIONS.md) | Host configs, OpenCode, OAuth, local credentials, model adapters, frameworks and upgrades |
 | [WORKFLOWS.md](WORKFLOWS.md) | Exact amount units, approval handling, funding, purchases, trading, retries and completion evidence |
 | [PROTOCOLS.md](PROTOCOLS.md) | Supported networks/protocols, Hyperliquid details, provider/WalletConnect behavior and limitations |
-| [TOOLS.md](TOOLS.md) | All 52 canonical tools, descriptions and complete input JSON Schemas |
+| [TOOLS.md](TOOLS.md) | All 57 canonical tools, descriptions and complete input JSON Schemas |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Cached tools, sign-in, approvals, gas/route failures, stale data and uncertain orders |
 | [TESTING.md](TESTING.md) | Test commands, skipped/live distinctions and what an end-to-end pass requires |
 | [DISTRIBUTION.md](DISTRIBUTION.md) | Public distribution routes and vendor-review boundaries |

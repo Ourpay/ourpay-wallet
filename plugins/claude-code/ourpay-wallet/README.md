@@ -1,6 +1,6 @@
 # OurPay Wallet plugin
 
-Connect an AI agent to the owner's existing OurPay account wallet. SDK 0.9.6 includes **52 MCP tools** for wallet discovery, funding, transfers, conversions, merchant purchases, simulated EVM calls, signatures, app connections and Hyperliquid trading. Agents never receive the recovery phrase.
+Connect an AI agent to the owner's existing OurPay account wallet. SDK 0.10.0 includes **57 MCP tools** for wallet discovery, funding, transfers, conversions, merchant purchases, simulated EVM calls, signatures, app connections and Hyperliquid trading. Agents never receive the recovery phrase.
 
 [Open wallet](https://wallet.ourpay.dev/wallet) · [Download packages](https://wallet.ourpay.dev/agents) · [Public repository](https://github.com/Ourpay/ourpay-wallet)
 
@@ -43,7 +43,7 @@ The owner can view the recovery phrase in wallet Settings after recent sign-in. 
 - [Owner guide](skills/ourpay-wallet/references/USER_GUIDE.md): setup, screens, funds, controls and recovery.
 - [Workflows](skills/ourpay-wallet/references/WORKFLOWS.md): exact units, approvals, multi-leg funding, execution and retries.
 - [Protocol guide](skills/ourpay-wallet/references/PROTOCOLS.md): supported capabilities and boundaries, including Hyperliquid and WalletConnect.
-- [Complete tool reference](skills/ourpay-wallet/references/TOOLS.md): all 52 tools and complete input schemas.
+- [Complete tool reference](skills/ourpay-wallet/references/TOOLS.md): all 57 tools and complete input schemas.
 - [Integration guide](skills/ourpay-wallet/references/INTEGRATIONS.md): all host profiles, model formats and framework examples.
 - [Troubleshooting](skills/ourpay-wallet/references/TROUBLESHOOTING.md): stale catalogs, funding failures and uncertain outcomes.
 - [Testing](skills/ourpay-wallet/references/TESTING.md): what fixture, testnet and live checks actually establish.

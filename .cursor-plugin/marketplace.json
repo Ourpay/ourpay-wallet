@@ -8,7 +8,7 @@
       "name": "ourpay-wallet",
       "source": "./plugins/cursor/ourpay-wallet",
       "description": "OurPay wallets for AI agents and their owners",
-      "version": "0.9.6",
+      "version": "0.10.0",
       "logo": "assets/logo.png"
     }
   ]

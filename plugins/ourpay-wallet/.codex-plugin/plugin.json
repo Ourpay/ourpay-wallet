@@ -1,6 +1,6 @@
 {
   "name": "ourpay-wallet",
-  "version": "0.9.6",
+  "version": "0.10.0",
   "description": "One OurPay wallet for people and agents, with recovery, transfers, conversion and merchant purchases.",
   "author": {
     "name": "OurPay"
