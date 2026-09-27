@@ -109,7 +109,7 @@ The application controls the model and its credentials. Compatibility with the C
 
 Responses definitions explicitly disable strict normalization so optional fee fields keep their meanings. All calls still pass through the MCP server's input validation. Result adapters retain provider call IDs and explicit error indicators. Gemini's example retains the complete model content, including thought signatures. Calls run sequentially in the examples, and no adapter automatically retries a payment or invents an idempotency key.
 
-`allowTools` filters both advertised tools and execution; an empty array disables every tool. The examples expose wallet setup and reads only. Applications can enable transfer, swap and purchase tools when their user authorization workflow is ready. Omitting `allowTools` exposes all 51 tools under the wallet's existing backend authorization. Host/application permission checks remain the caller's responsibility.
+`allowTools` filters both advertised tools and execution; an empty array disables every tool. The examples expose wallet setup and reads only. Applications can enable transfer, swap and purchase tools when their user authorization workflow is ready. Omitting `allowTools` exposes all 52 tools under the wallet's existing backend authorization. Host/application permission checks remain the caller's responsibility.
 
 To run a model example, install the example dependencies and provide your own model/account:
 
@@ -150,7 +150,7 @@ Archives and SHA-256 checksums are written to `dist/releases/`. The complete ext
 
 ## Multichain assets
 
-All formats expose the same 51 tools, including `ourpay_wallet_search_products`, `ourpay_open_product_checkout`, `ourpay_wallet_addresses`, `ourpay_wallet_assets` and `ourpay_wallet_convert`. Transfer/swap amounts remain integer base-unit strings; Hyperliquid order sizes and prices use human-unit decimal strings. Discover the chain family, native asset, decimals and execution availability before spending. EVM and Solana use different public addresses derived from one recovery phrase. See [the capability map](PROTOCOLS.md) for routing, gas and protocol limits.
+All formats expose the same 52 tools, including `ourpay_wallet_search_products`, `ourpay_open_product_checkout`, `ourpay_wallet_addresses`, `ourpay_wallet_assets` and `ourpay_wallet_convert`. Transfer/swap amounts remain integer base-unit strings; Hyperliquid order sizes and prices use human-unit decimal strings. Discover the chain family, native asset, decimals and execution availability before spending. EVM and Solana use different public addresses derived from one recovery phrase. See [the capability map](PROTOCOLS.md) for routing, gas and protocol limits.
 
 ### Perpetuals and standing limit orders
 

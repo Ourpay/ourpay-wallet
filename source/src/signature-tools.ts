@@ -1,3 +1,4 @@
+import { type ToolResult } from './tool-support.js'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 import { AgentWalletClient } from './client.js'
@@ -22,7 +23,6 @@ export interface WalletSignature extends SignatureRequest {
   owner_approval_url: string
 }
 
-type ToolResult = (operation: () => Promise<unknown>) => Promise<{ content: { type: 'text'; text: string }[]; isError?: boolean }>
 
 export function registerSignatureTools(server: McpServer, client: AgentWalletClient, result: ToolResult) {
   server.registerTool('ourpay_wallet_request_signature', {

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.6
+
+- Add `ourpay_wallet_guide` with task-specific workflows for every supported wallet operation, including market discovery, charts and parallel exchange orders.
+- Expose the same order-precision constraints used by the signer and the account’s base fee schedule; unavailable fees remain explicit.
+- Reject inconsistent or duplicate candle data without hiding valid market sections.
+- Consolidate shared MCP tool annotations without changing permissions or existing tool names.
+- 52 tools across six native packages, 18 client profiles and model adapters.
+
 ## 0.9.5
 
 - Search automatically indexed public products across OurPay merchants, with names and reusable checkout links.

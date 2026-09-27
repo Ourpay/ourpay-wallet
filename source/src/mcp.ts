@@ -1,3 +1,5 @@
+import { registerGuideTool, walletInstructions } from './guide.js'
+import { readOnly, spending } from './tool-support.js'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 import { AgentWalletClient, WalletAPIError, WalletApprovalRequiredError } from './client.js'
@@ -11,8 +13,6 @@ import { registerDappTools } from './dapp-tools.js'
 
 const address = z.string().regex(/^(?:0x[0-9a-fA-F]{40}|[1-9A-HJ-NP-Za-km-z]{32,44})$/)
 const baseUnits = z.string().regex(/^[1-9][0-9]{0,77}$/)
-const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
-const spending = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true }
 const conversionInput = z.object({
   idempotency_key: z.string().uuid(), from_chain_id: z.number().int().positive(),
   from_token: address, from_amount: baseUnits, to_chain_id: z.number().int().positive(),
@@ -22,10 +22,11 @@ const conversionInput = z.object({
 
 export function createWalletMCP(client: AgentWalletClient, options: { provision?: boolean } = {}): McpServer {
   const server = new McpServer({
-    name: 'OurPay Wallet', title: 'OurPay Wallet', version: '0.9.5',
+    name: 'OurPay Wallet', title: 'OurPay Wallet', version: '0.9.6',
     websiteUrl: 'https://wallet.ourpay.dev/agents',
     icons: [{ src: 'https://wallet.ourpay.dev/ourpay-wallet-logo.png', mimeType: 'image/png', sizes: ['512x512'] }],
-  })
+  }, { instructions: walletInstructions })
+  registerGuideTool(server)
   const result = async (operation: () => Promise<unknown>) => {
     try {
       return { content: [{ type: 'text' as const, text: JSON.stringify(await operation()) }] }

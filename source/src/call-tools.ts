@@ -1,10 +1,8 @@
+import { type ToolResult, readOnly, spending } from './tool-support.js'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 import { AgentWalletClient } from './client.js'
 
-type ToolResult = (operation: () => Promise<unknown>) => Promise<{ content: { type: 'text'; text: string }[]; isError?: boolean }>
-const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
-const spending = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true }
 
 export function registerCallTools(server: McpServer, client: AgentWalletClient, result: ToolResult) {
   server.registerTool('ourpay_wallet_call_capabilities', {

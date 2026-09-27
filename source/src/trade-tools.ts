@@ -1,10 +1,8 @@
+import { type ToolResult, readOnly, spending } from './tool-support.js'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 import { AgentWalletClient } from './client.js'
 
-type ToolResult = (operation: () => Promise<unknown>) => Promise<{ content: { type: 'text'; text: string }[]; isError?: boolean }>
-const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false }
-const spending = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true }
 const address = z.string().regex(/^0x[0-9a-fA-F]{40}$/)
 const amount = z.string().regex(/^[1-9][0-9]{0,77}$/)
 

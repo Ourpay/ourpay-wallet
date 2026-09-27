@@ -1,3 +1,4 @@
+import { type ToolResult } from './tool-support.js'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 import type { AgentWalletClient } from './client.js'
@@ -9,8 +10,7 @@ export interface DappConnection {
   max_signatures: number; signed_count: number; connected: boolean
   expires_at: string | null; revoked_at: string | null; owner_approval_url: string
 }
-type Result = (operation: () => Promise<unknown>) => Promise<{ content: { type: 'text'; text: string }[]; isError?: boolean }>
-export function registerDappTools(server: McpServer, client: AgentWalletClient, result: Result) {
+export function registerDappTools(server: McpServer, client: AgentWalletClient, result: ToolResult) {
   server.registerTool('ourpay_wallet_connect_dapp', {
     description: 'Connect this account-owned wallet to an exact HTTPS crypto-app origin and EVM chain IDs. With Risky mode off, OurPay emails the owner a review link for a new app connection; all normal-mode signatures need separate approval. Risky mode authorizes supported app connections and signing automatically. Read the returned scope; approved and connected are required to use this grant. Use dapp_connection_id with request_signature. An app cannot grant itself permission. A prior owner grant can reconnect until expiry, but revoked grants require a new agent connection.',
     inputSchema: z.object({ origin: z.string().url().max(2048), chain_ids: z.array(z.number().int().positive()).min(1).max(50) }),

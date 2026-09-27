@@ -1,3 +1,4 @@
+import { type ToolResult, externalReadOnly as readOnly } from './tool-support.js'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 import type { AgentWalletClient } from './client.js'
@@ -29,10 +30,8 @@ export interface WalletFunding {
   owner_url: string; app_url: string | null; instructions_url: string | null
   instructions: string[]; observed_at: string
 }
-type Result = (operation: () => Promise<unknown>) => Promise<{ content: { type: 'text'; text: string }[]; isError?: boolean }>
-const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true }
 
-export function registerFundingTools(server: McpServer, client: AgentWalletClient, result: Result) {
+export function registerFundingTools(server: McpServer, client: AgentWalletClient, result: ToolResult) {
   server.registerTool('ourpay_wallet_funding_sources', {
     description: 'Find this wallet’s native USDC across enabled gasless source networks. Check this before asking the user for separate gas or Hyperliquid deposits. Prepare required gas before starting ordinary swaps, calls or purchases. Null balances mean unavailable reads, not zero. Gasless routes spend USDC inclusive of provider fees and deliver gas, USDC, or Hyperliquid mainnet spot/perpetual collateral to this same wallet. Other assets use ordinary swap routes when source gas is available.',
     inputSchema: z.object({}), annotations: readOnly,

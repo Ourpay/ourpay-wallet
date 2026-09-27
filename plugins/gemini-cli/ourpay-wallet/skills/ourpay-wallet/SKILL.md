@@ -5,6 +5,9 @@ description: Connect to an account-owned OurPay wallet, discover merchant produc
 
 # OurPay wallet
 
+Start with `ourpay_wallet_guide` for the relevant workflow (`overview`, `permissions`, `funding`, `transfers`, `swaps`, `purchases`, `hyperliquid`, `dapps`, or `all`). It explains live discovery, amount units, permissions, retries and settlement. Then read `ourpay_wallet` for the connected account.
+
+
 Use the host's connected `ourpay_*` MCP tools. Hosts may add a server prefix to these names.
 
 Call `ourpay_wallet` to get the address and status. Show any returned setup link to the owner to sign in to OurPay and approve this connection. All agents approved by the same account use its one wallet. Initial setup requires the owner to save their backup privately; signing in later restores account access. Never create an anonymous wallet. Never retrieve, request, copy or store their recovery phrase. The owner saves it privately in OurPay. A public address identifies a wallet but cannot authenticate access.

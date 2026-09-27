@@ -1,6 +1,6 @@
 {
   "name": "@ourpay/agent-wallets",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "private": true,
   "description": "OurPay wallets for AI agents and their owners",
   "type": "module",

@@ -1,16 +1,16 @@
+import { type ToolResult, externalReadOnly as readOnly, spending } from './tool-support.js'
 import { McpServer } from '@modelcontextprotocol/server'
 import { z } from 'zod'
 import { AgentWalletClient } from './client.js'
 
-type ToolResult = (operation: () => Promise<unknown>) => Promise<{ content: { type: 'text'; text: string }[]; isError?: boolean }>
-const readOnly = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true }
-const spending = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true }
 const network = z.enum(['mainnet', 'testnet'])
 const amount = z.string().regex(/^(?:0|[1-9][0-9]{0,17})(?:\.[0-9]{1,18})?$/).max(38)
 
+const exchangeMarket = z.string().regex(/^(?:perp:(?:[A-Za-z0-9_.-]+:)?[A-Za-z0-9_.-]+|spot:(?:@[0-9]+|PURR\/USDC))$/).max(80)
+
 const exchangeOrderInput = z.strictObject({
       idempotency_key: z.string().uuid(), network,
-      market: z.string().regex(/^(?:perp:(?:[A-Za-z0-9_.-]+:)?[A-Za-z0-9_.-]+|spot:(?:@[0-9]+|PURR\/USDC))$/).max(80),
+      market: exchangeMarket,
       side: z.enum(['buy', 'sell']), size: amount, limit_price: amount,
       order_type: z.enum(['limit', 'market']).optional(),
       time_in_force: z.enum(['Gtc', 'Alo']).optional(), reduce_only: z.boolean().optional(),
@@ -24,15 +24,15 @@ export function registerExchangeTools(server: McpServer, client: AgentWalletClie
     inputSchema: z.object({}), annotations: readOnly,
   }, () => result(() => client.exchangeCapabilities()))
   server.registerTool('ourpay_wallet_exchange_markets', {
-    description: 'Discover live Hyperliquid perpetual markets across default and builder-deployed (HIP-3) venues, and spot pairs across all quote assets, exact market IDs, size decimals, mark prices, funding rates and maximum leverage. These are exchange assets, not EVM token addresses. Use the returned ID such as perp:BTC or spot:@107. A listed market still needs liquidity and owner permission. Use offset and limit to page through the full catalogue. Read dex, quote_symbol, quote_usd_price and margin_modes; collateral differs by venue. Null USD valuation prevents normal dollar-budget execution. Assets may be unavailable in your jurisdiction.',
+    description: 'Discover live Hyperliquid perpetual markets across default and builder-deployed (HIP-3) venues, and spot pairs across all quote assets, exact market IDs, size decimals, order_constraints (size step and price precision), mark prices, funding rates and maximum leverage. These are exchange assets, not EVM token addresses. Use the returned ID such as perp:BTC or spot:@107. A listed market still needs liquidity and owner permission. Use offset and limit to page through the full catalogue. Read dex, quote_symbol, quote_usd_price and margin_modes; collateral differs by venue. Null USD valuation prevents normal dollar-budget execution. Assets may be unavailable in your jurisdiction.',
     inputSchema: z.object({ network, search: z.string().max(80).optional(), limit: z.number().int().min(1).max(500).optional(), offset: z.number().int().min(0).max(10000).optional() }), annotations: readOnly,
   }, ({ network, search, limit, offset }) => result(() => client.exchangeMarkets(network, search, limit, offset)))
   server.registerTool('ourpay_wallet_exchange_market_data', {
     description: 'Analyze a supported Hyperliquid market before deciding whether to trade: mark/oracle and previous-day prices, 24-hour USD volume, funding rate, open interest in base units, up to 20 order-book levels per side, 100 recent trades and up to 500 OHLCV candles. Use an exact ID from exchange_markets. Read observed_at and provider timestamps; this is a snapshot, not a live feed. Candle closed=false means still forming. Null sections with errors are unavailable, never empty or zero. Refresh missing or stale data before trading. Combine with exchange_account, exchange_fills and capabilities for positions, collateral, execution fees and permissions. This tool does not place trades or start an autonomous trading loop. Only trade within the user’s requested task; existing owner permissions still apply.',
-    inputSchema: z.object({ network, market: z.string().regex(/^(?:perp:(?:[A-Za-z0-9_.-]+:)?[A-Za-z0-9_.-]+|spot:(?:@[0-9]+|PURR\/USDC))$/).max(80), interval: z.enum(['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '8h', '12h', '1d', '3d', '1w']).optional(), limit: z.number().int().min(1).max(500).optional() }), annotations: readOnly,
+    inputSchema: z.object({ network, market: exchangeMarket, interval: z.enum(['1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '8h', '12h', '1d', '3d', '1w']).optional(), limit: z.number().int().min(1).max(500).optional() }), annotations: readOnly,
   }, ({ network, market, interval, limit }) => result(() => client.exchangeMarketData(network, market, interval, limit)))
   server.registerTool('ourpay_wallet_exchange_account', {
-    description: 'Read Hyperliquid positions, margin, liquidation prices, unrealized PnL, spot balances and open orders for this wallet address. HyperCore exchange funds are separate from on-chain EVM/Solana and HyperEVM HYPE balances. Before requesting a separate top-up, use ourpay_wallet_funding_sources and ourpay_wallet_prepare_funding to fund mainnet spot/perpetual USDC from existing wallet funds. Recheck this account after funding is confirmed. Withdrawals and internal collateral transfers remain unsupported. Never request a recovery phrase.',
+    description: 'Read Hyperliquid positions, margin, liquidation prices, unrealized PnL, spot balances and open orders for this wallet address. HyperCore exchange funds are separate from on-chain EVM/Solana and HyperEVM HYPE balances. Before requesting a separate top-up, use ourpay_wallet_funding_sources and ourpay_wallet_prepare_funding to fund mainnet spot/perpetual USDC from existing wallet funds. Recheck this account after funding is confirmed. Read dex-specific collateral for builder-deployed markets. fee_schedule is the current base account schedule; rates are decimal fractions and venue-specific fees may differ. Null fees with errors mean unavailable, not zero. The direct exchange tools do not submit withdrawals or internal collateral transfers; authorized connected-app signing is a separate flow. Never request a recovery phrase.',
     inputSchema: z.object({ network, dex: z.string().regex(/^[A-Za-z0-9_.-]{0,40}$/).optional() }), annotations: readOnly,
   }, ({ network, dex }) => result(() => client.exchangeAccount(network, dex)))
   server.registerTool('ourpay_wallet_place_order', {

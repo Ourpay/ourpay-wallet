@@ -19,6 +19,10 @@ export interface ExchangeMarket {
   size_decimals: number; max_leverage: number; mark_price: string
   funding_rate: string | null; open_interest: string | null
   previous_day_price: string | null; daily_volume_usd: string | null; oracle_price: string | null
+  order_constraints: {
+    size_step: string; price_max_decimals: number
+    price_max_significant_figures: number; integer_prices_allowed: boolean
+  }
 }
 
 export type ExchangeCandleInterval = '1m' | '3m' | '5m' | '15m' | '30m' | '1h' | '2h' | '4h' | '8h' | '12h' | '1d' | '3d' | '1w'
@@ -35,6 +39,7 @@ export interface ExchangeAccount {
   dex: string; perpetuals: Record<string, unknown>; spot: Record<string, unknown>
   open_orders: Record<string, unknown>[]; funding_instructions_url: string
   observed_at: string; account_url: string; trading_url: string
+  fee_schedule: Record<string, unknown> | null; errors: Record<string, string>
 }
 
 export interface ExchangeOrderRequest {

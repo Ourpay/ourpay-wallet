@@ -22,7 +22,7 @@ export class WalletToolSession {
 
   static async create(wallet: AgentWalletClient, options: { allowTools?: readonly string[] } = {}) {
     const server = createWalletMCP(wallet)
-    const client = new Client({ name: 'OurPay model adapter', version: '0.9.5' })
+    const client = new Client({ name: 'OurPay model adapter', version: '0.9.6' })
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
     try {
       await server.connect(serverTransport)
