@@ -1,5 +1,15 @@
 # Changelog
 
+## Documentation update — September 27, 2026
+
+- Add an owner guide covering wallet screens, funding, permissions, recovery and Hyperliquid website connection.
+- Add detailed workflows for approvals, exact amount units, two-leg gas funding, transfers, swaps, product discovery/purchases, dApps and exchange execution.
+- Generate the complete 52-tool input reference directly from the MCP registry and verify it during documentation checks.
+- Expand OpenCode refresh/authentication instructions, troubleshooting and dated testing/coverage boundaries.
+- Package the same maintained references with all native agent skills and Gemini context; keep relative links usable in each distribution.
+- Correct stale tool counts, old package filenames, one-time-only recovery wording and the distinction between direct exchange methods and connected-app signing.
+- Document the canonical shared MCP deployment requirement. Repository documentation changes do not overwrite the immutable 0.9.6 archives or change wallet permissions/runtime behavior.
+
 ## 0.9.6
 
 - Add `ourpay_wallet_guide` with task-specific workflows for every supported wallet operation, including market discovery, charts and parallel exchange orders.

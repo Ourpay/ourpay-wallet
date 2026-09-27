@@ -2,9 +2,26 @@
 
 # OurPay Wallet
 
-One account-owned crypto wallet for you and your AI agents. Sign in to your OurPay account from each agent to connect the same wallet.
+One account-owned crypto wallet for you and your authorized AI agents. Sign in to the same OurPay account from ChatGPT, Claude, a coding agent or a compatible application to use the same wallet, with separately revocable connections.
 
-[Open your wallet](https://wallet.ourpay.dev/wallet) · [Install and connect](https://wallet.ourpay.dev/agents) · [Release downloads](https://github.com/Ourpay/ourpay-wallet/releases/latest)
+**52 tools · 6 native packages · 18 client profiles · 5 model tool formats · 4 framework examples**
+
+[Open wallet](https://wallet.ourpay.dev/wallet) · [Connect an agent](https://wallet.ourpay.dev/agents) · [Release downloads](https://github.com/Ourpay/ourpay-wallet/releases/latest) · [All tools](TOOLS.md)
+
+## What it can do
+
+| Area | Implemented capabilities |
+| --- | --- |
+| Account and wallet | Account sign-in, EVM/Solana addresses, supported-network and asset discovery, balances, owner recovery and revocable agent connections |
+| Transfers | Native currency, ERC-20 and standard SPL transfers, receipt tracking and durable retries |
+| Conversion | Supported same-chain swaps and EVM/Solana cross-chain routes with explicit minimum output, slippage and fee limits |
+| Funding | Discover native USDC and quote gas, destination USDC or mainnet Hyperliquid collateral funding; continue multi-leg routes using actual received amounts |
+| Merchant purchases | Search eligible OurPay products, open candidate checkouts, inspect details, prepare crypto invoices, quote/convert/pay and track the canonical order |
+| EVM applications | Simulated sequential contract calls, personal/EIP-712 signatures, app grants, read-only RPC, an Ethereum provider and WalletConnect adapter |
+| Hyperliquid | Spot/default/HIP-3 market discovery, book/candle/trade snapshots, account and fee data, isolated or supported cross margin, leverage, GTC/ALO/IOC orders, concurrent independent orders, cancellation and fills |
+| Owner control | Standard-mode action approval with email review links, shared daily allowance, owner-enabled Risky mode, pause and disconnect |
+
+Availability depends on enabled networks, exact assets/markets, liquidity, provider/venue state and owner permissions. General wallet signing is not a complete integration with every dApp. The wallet does not include a continuous strategy scheduler, complete Polymarket trading adapter, arbitrary internet checkout adapter or fiat/card/UPI payments. [Full capability boundaries](PROTOCOLS.md).
 
 ## Connect with OAuth
 
@@ -14,11 +31,17 @@ Add this Streamable HTTP MCP server to a host that supports remote MCP with OAut
 https://mcp.ourpay.dev/wallet/mcp
 ```
 
-Follow the OurPay sign-in link and authorize that agent. The host's plan and administrator settings can affect connector availability. Custom connector support does not mean the plugin is listed in that host's public directory.
+Use the full `/wallet/mcp` path. Follow OurPay sign-in and consent, using the account that owns your wallet. The host's plan, version and administrator settings can affect connector availability. Custom-connector support and repository installation are separate from vendor public-directory approval.
 
-## Coding agents
+Then ask:
 
-Local packages need Node.js 24 or later. They include the MCP runtime, so an API key or an npm install is not needed to run them. The first wallet call opens account authorization. Do not paste a recovery phrase into your agent.
+> Call `ourpay_wallet_guide` with topic `overview`, then read my wallet and supported networks. Do not submit any payment, signature or trade.
+
+The guide provides task-specific instructions. A fresh 0.9.6 catalog has **52 tools**: three checkout tools and 49 wallet tools. Restart a host that cached an older catalog; update the executable as well if using a local package. An ordinary tool update does not require a new wallet. [Refresh and troubleshooting](TROUBLESHOOTING.md).
+
+## Install in coding agents
+
+Local packages require Node.js 24 or newer and include the MCP runtime. The server does not need a merchant API key or an npm install to run. Its first wallet call returns account authorization; it does not ask for your recovery phrase.
 
 ### Claude Code
 
@@ -29,7 +52,7 @@ claude plugin install ourpay-wallet@ourpay
 
 ### Codex
 
-Add this public repository as a marketplace, then install `ourpay-wallet` from the OurPay marketplace in the plugin browser:
+Add the public repository marketplace, then install `ourpay-wallet` from OurPay in the plugin browser:
 
 ```sh
 codex plugin marketplace add https://github.com/Ourpay/ourpay-wallet.git
@@ -43,7 +66,7 @@ gemini extensions install https://github.com/Ourpay/ourpay-wallet
 
 ### GitHub Copilot CLI
 
-The repository root implements the Agent Plugins format:
+The repository root implements the portable Agent Plugins format:
 
 ```sh
 copilot plugin install Ourpay/ourpay-wallet
@@ -51,30 +74,67 @@ copilot plugin install Ourpay/ourpay-wallet
 
 ### Cursor and Claude Desktop
 
-Download the matching package from [Releases](https://github.com/Ourpay/ourpay-wallet/releases/latest). Put the extracted Cursor plugin in `~/.cursor/plugins/local/ourpay-wallet` and reload Cursor. Open the `.mcpb` bundle in Claude Desktop; its managed runtime must support Node 24. Where it does not, use the hosted OAuth connector or an external Node runtime as described in [INTEGRATIONS.md](INTEGRATIONS.md).
+Use their native release packages from [downloads](https://github.com/Ourpay/ourpay-wallet/releases/latest). Cursor includes a local plugin manifest; Claude Desktop uses `.mcpb`. If a managed runtime is older than Node 24, use the generated configuration with a compatible external Node executable.
 
-The integration bundle also generates configurations for 18 clients and includes adapters for OpenAI-compatible APIs, Anthropic, Gemini, Ollama, LangChain, Pydantic and Google ADK. See [the full integration guide](INTEGRATIONS.md).
+### OpenCode and other hosts
 
-## Capabilities
+OpenCode can use the hosted OAuth URL directly. The complete integrations archive generates profiles for Codex, Claude Code, Claude Desktop, Cursor, VS Code/Copilot, Windsurf, Cline, Roo Code, Continue, Gemini CLI, OpenCode, Kiro, Goose, Zed, Copilot CLI, LM Studio, Kilo and generic MCP clients.
 
-The same 52 MCP tools provide wallet addresses, balances, network and token discovery, transfers, swaps, bridging, cross-merchant product search and checkout, policy-constrained contract calls, signing, crypto-app connections, and Hyperliquid spot/perpetual orders.
+From the complete extracted bundle:
 
-Public merchant products enter search automatically. Agents can find products by name and description, open the returned checkout links to inspect current details, and use the existing authorized purchase flow without asking the user for a checkout URL.
+```sh
+node configure.mjs --list
+node configure.mjs --target opencode --transport remote
+node configure.mjs --target all --out ./local-configs
+```
 
-Supported native USDC on Ethereum, Arbitrum, Base, Optimism, Polygon and Avalanche can fund network gas and Hyperliquid through quoted routes. Availability depends on network configuration, providers and liquidity. Solana-only USDC with zero SOL is not a supported gasless source. HyperCore withdrawals and internal collateral transfers are not implemented.
+Merge the generated server entry into your existing configuration. Do not replace unrelated servers. Private local connection files must remain on your machine and persist across restarts. The SDK is not published on npm; do not use `npx @ourpay/agent-wallets` as an installation method. [Complete integration instructions](INTEGRATIONS.md).
 
-Normal mode requires owner approval for each payment, trade, signature and app connection, with an email linking to the review page. The default USD spending limit is $10,000 per day shared across agents, adjustable by the owner. Owner-enabled Risky mode removes OurPay's per-action prompts and budget checks for supported actions; host controls, pause and revocation still apply.
+## Fund once, then authorize the task
 
-Read [PROTOCOLS.md](PROTOCOLS.md) for the precise capability map. A pending transaction or order is not a confirmed payment or fill.
+Send the correct asset to the wallet address for your chosen network. EVM networks share one EVM address; Solana uses another. Every chain's balance remains separate.
 
-## Release verification
+Agents can use native USDC on enabled Ethereum, Optimism, Polygon, Base, Arbitrum and Avalanche networks to obtain gas or mainnet Hyperliquid collateral through supported funding routes. Fees come from the authorized USDC input. Routes, minimum sizes and liquidity still matter; this does not provide free gas or universal support for every chain. Solana can receive gas through supported routes but is not a zero-SOL USDC gasless source.
 
-Wallet execution and retry logic passed 217 backend tests using local chains and simulated providers. The SDK and hosted connector passed 28 SDK and 19 hosted MCP checks; four optional SDK integration tests require separate fixtures and were skipped. Public provider quotes and deployed read endpoints were checked. A funded mainnet end-to-end deposit and trade has not yet been verified.
+HyperCore exchange collateral, HyperEVM HYPE and on-chain USDC are distinct balances. A funding quote does not prove delivery, and an exchange account value does not mean all collateral is withdrawable. [Funding and settlement workflow](WORKFLOWS.md#fund-gas-or-hyperliquid-from-existing-usdc).
 
-Public downloads and a self-hosted marketplace are separate from a reviewed vendor directory listing. [DISTRIBUTION.md](DISTRIBUTION.md) records the publication routes and restrictions.
+## Permissions and recovery
 
-## Source and privacy
+Standard mode requires owner review for new payments, trades, contract submissions, signatures and app connections. OurPay sends an email review link and returns the owner URL to the agent. The default $10,000 daily USD allowance is shared across agents and resets at 00:00 UTC; owners can adjust it. Reservations are authorization estimates, not maximum-loss guarantees.
 
-The MCP client source is in `source/src`. To typecheck and build it, run `npm ci && npm run build` in `source/` using Node 24+. Wallet signing and custody run on OurPay's hosted service; they are not part of this client repository. Local connection credentials are stored privately outside the plugin and must never be committed. The tools do not return recovery phrases or private keys.
+Owner-enabled Risky mode skips supported per-action approvals and shared spending restrictions. Pause, revocation, supported-action validation and the host's own controls still apply. It does not authorize an agent to invent a trading strategy or spend outside your task.
 
-The client code is Apache-2.0 licensed. Bundled dependency licenses are in [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt). The OurPay name and logo identify the service and are not a grant of trademark rights.
+Save the initial recovery phrase privately. You can reveal it later in wallet Settings after recent owner authentication. OurPay retains an encrypted backup; the owner-held phrase is an independent backup. Agents never receive it. Recovery preserves addresses and revokes prior connections. [Owner guide](USER_GUIDE.md).
+
+## Agent and developer documentation
+
+| Document | Contents |
+| --- | --- |
+| [USER_GUIDE.md](USER_GUIDE.md) | Setup, wallet screens, funds, recovery, Hyperliquid website connection and controls |
+| [INTEGRATIONS.md](INTEGRATIONS.md) | Host configs, OpenCode, OAuth, local credentials, model adapters, frameworks and upgrades |
+| [WORKFLOWS.md](WORKFLOWS.md) | Exact amount units, approval handling, funding, purchases, trading, retries and completion evidence |
+| [PROTOCOLS.md](PROTOCOLS.md) | Supported networks/protocols, Hyperliquid details, provider/WalletConnect behavior and limitations |
+| [TOOLS.md](TOOLS.md) | All 52 canonical tools, descriptions and complete input JSON Schemas |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Cached tools, sign-in, approvals, gas/route failures, stale data and uncertain orders |
+| [TESTING.md](TESTING.md) | Test commands, skipped/live distinctions and what an end-to-end pass requires |
+| [DISTRIBUTION.md](DISTRIBUTION.md) | Public distribution routes and vendor-review boundaries |
+| [CHANGELOG.md](CHANGELOG.md) | Versioned changes and repository documentation updates |
+| [Agent skill](skills/ourpay-wallet/SKILL.md) | Task-oriented instructions and packaged references |
+
+Model adapters support OpenAI Responses, Chat Completions-compatible function tools, Anthropic Messages, Gemini and tool-capable Ollama models. Framework examples cover OpenAI Agents SDK, LangChain/LangGraph, PydanticAI and Google ADK. The application supplies its model credentials, tool filters and execution loop; the wallet does not select a model or run a strategy for it.
+
+## Source and verification
+
+Build the distributed SDK source with Node 24+:
+
+```sh
+cd source
+npm ci
+npm run build
+```
+
+The application repository owns the full tests and generation pipeline; this public repository includes the SDK source, plugin manifests, packaged runtime and documentation. Local packaging/schema/fixture tests, live read checks and funded execution are different evidence. See the dated [0.9.6 verification snapshot](TESTING.md#dated-096-verification-snapshot), including skipped checks and the corrected canonical MCP deployment.
+
+Documentation on `main` can be newer than a tagged package. Tags, archives and checksums remain fixed; changes to this README do not upgrade an installed executable. Pin a reviewed tag/commit for reproducible Git installs and use the matching release archive when updating a runtime.
+
+Licensed under [Apache-2.0](LICENSE). Bundled dependencies are documented in [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt). No recovery phrase, connection credential or backend custody secret belongs in this repository.

@@ -1,28 +1,52 @@
 # OurPay Wallet plugin
 
-One account-owned wallet for an owner and their agents. The plugin exposes 45 MCP tools for EVM/Solana addresses, token discovery, transfers, conversion, trading, signatures, OurPay purchases, simulated contract calls, Hyperliquid spot/perpetual orders, funding requests and approval tracking. Use a tool-capable model in your host. Node 24 or newer must be available to the host as `node`.
+Connect an AI agent to the owner's existing OurPay account wallet. SDK 0.9.6 includes **52 MCP tools** for wallet discovery, funding, transfers, conversions, merchant purchases, simulated EVM calls, signatures, app connections and Hyperliquid trading. Agents never receive the recovery phrase.
 
-Normal mode emails the owner to approve each new payment, trade, signature and app connection. Spending results include an approval ID and review URL; `ourpay_wallet_approval` follows that request to its execution result. Only the owner can approve it. Owner-enabled Risky mode runs supported actions without per-action confirmations or approval emails. External host confirmations remain independent.
+[Open wallet](https://wallet.ourpay.dev/wallet) · [Download packages](https://wallet.ourpay.dev/agents) · [Public repository](https://github.com/Ourpay/ourpay-wallet)
 
-This folder contains a self-contained server; no npm install is needed. Keep the entire folder together. Install the package built for your host:
+## Install and connect
 
-| Package | Installation |
+Use Node.js 24 or newer for local packages. The packaged server includes its runtime dependencies. Do not install an unrelated npm package with the same name.
+
+| Host | Package/use |
 | --- | --- |
-| Codex | Install from your Codex plugin marketplace, or configure this folder's `scripts/wallet-mcp.mjs` as a local MCP server using an absolute Node and script path. |
-| Claude Code | Launch `claude --plugin-dir /absolute/path/ourpay-wallet`. For persistent distribution, register the built folder in your team's plugin marketplace. |
-| Cursor | Copy the folder to `~/.cursor/plugins/local/ourpay-wallet`, then reload Cursor. Local plugin imports must be permitted by your organization. |
-| Gemini CLI | Run `gemini extensions install /absolute/path/ourpay-wallet`. |
-| GitHub Copilot CLI | Run `copilot plugin install /absolute/path/ourpay-wallet`. |
-| Claude Desktop | Open the `.mcpb` bundle to install. The host must supply Node 24+. If its bundled runtime is older, configure an external Node 24 executable and the script using Developer → Edit Config. |
+| Codex | Install the OurPay repository marketplace/plugin, or use a generated MCP configuration |
+| Claude Code | Install the OurPay marketplace plugin, or use `claude --plugin-dir /absolute/path/ourpay-wallet` |
+| Cursor | Use the Cursor package/local plugin directory and reload; public listing is separate |
+| Gemini CLI | Install the repository or extracted extension with `gemini extensions install` |
+| Copilot CLI | Install the repository/extracted portable Agent Plugin |
+| Claude Desktop | Open the `.mcpb` bundle; use an external Node 24+ configuration if the managed runtime is older |
+| Other compatible hosts | Use the complete integrations bundle's host configuration generator or the hosted OAuth endpoint |
 
-Ask: “Connect my OurPay account and wallet.” The owner signs in, creates or links their wallet, privately saves the initial recovery phrase if needed, and approves this agent. Sign in to the same account from each host to reuse that wallet. Fund the returned address on a supported network. Never put the recovery phrase into a chat or plugin config.
+For a hosted OAuth connector, use **`https://mcp.ourpay.dev/wallet/mcp`**. `/mcp` is a different merchant service. Follow the OurPay sign-in link and approve this connection to the same account used in your wallet browser. See [full integration instructions](skills/ourpay-wallet/references/INTEGRATIONS.md).
 
-The default API is `https://api.ourpay.dev`. `OURPAY_API_URL` selects another HTTPS or loopback development API. `OURPAY_WALLET_CONNECTION_FILE` selects an alternative private connection file. Defaults are shared across local hosts on the same OS account and API endpoint, so they reuse one wallet and one revocable connection. For separate agent permissions, choose distinct private connection files or use hosted OAuth. Each connection requires owner consent.
+The first local `ourpay_wallet` call returns setup/consent when needed. A private connection file is saved below `~/.config/ourpay/wallets/`; preserve it across restarts and never share it. Different files allow independently revocable connections. No recovery phrase, merchant API key or model-provider credential is needed by the wallet MCP server.
 
-The hosted connector is `https://mcp.ourpay.dev/wallet/mcp`. Owner approval happens at `https://wallet.ourpay.dev/wallet/connect`; no credential should be pasted into a model prompt. ChatGPT uses OAuth Dynamic Client Registration with wallet read/spend scopes and OpenID Connect disabled. Availability of custom connectors depends on the host and account settings.
+## First read-only check
 
-Amounts use integer token base units. Quotes include slippage and fees. A transaction is complete only when confirmed; a merchant purchase requires `succeeded` and an `order_id`. Preserve request IDs when retrying. Wallets require supported assets and native gas unless a funded sponsor covers fees. See the bundled skill for the tool workflow.
+Ask your agent:
 
-Access defaults to until revoked, with optional owner deadlines. Agents can end their own access but cannot extend owner permissions. Ask the agent for a funding link when its on-chain or Hyperliquid balance is insufficient. HyperCore funds are separate from EVM and HyperEVM balances.
+> Call `ourpay_wallet_guide` with topic `overview`, then read my OurPay wallet and supported networks. Do not sign, transfer or trade.
 
-Download the current packages and installation guide at https://wallet.ourpay.dev/agents. These are directly distributable packages. Their creation does not mean they are listed or reviewed in public app marketplaces.
+The guide covers `permissions`, `funding`, `transfers`, `swaps`, `purchases`, `hyperliquid` and `dapps`, or `all`. If the host still exposes an older catalog, restart its MCP connection; local installations also need the current executable. Keep your existing wallet and credential. [Troubleshooting](skills/ourpay-wallet/references/TROUBLESHOOTING.md).
+
+## Owner controls
+
+Standard mode requires owner review for new payments, trades, signatures, contract submissions and app connections. OurPay emails a review link and returns an approval URL to the agent. The default $10,000 daily USD allowance is shared across agents and resets at 00:00 UTC; only the owner can change it.
+
+Owner-enabled Risky mode skips supported per-action approval and shared budget restrictions. Pause, revocation, supported networks and venue validation still apply. It does not supply a strategy or authorize actions outside the user's task. Permissions can last until revoked; individual quotes and signatures still expire.
+
+The owner can view the recovery phrase in wallet Settings after recent sign-in. Plugins cannot retrieve it. Account recovery retains addresses and revokes old connections.
+
+## Packaged documentation
+
+- [Owner guide](skills/ourpay-wallet/references/USER_GUIDE.md): setup, screens, funds, controls and recovery.
+- [Workflows](skills/ourpay-wallet/references/WORKFLOWS.md): exact units, approvals, multi-leg funding, execution and retries.
+- [Protocol guide](skills/ourpay-wallet/references/PROTOCOLS.md): supported capabilities and boundaries, including Hyperliquid and WalletConnect.
+- [Complete tool reference](skills/ourpay-wallet/references/TOOLS.md): all 52 tools and complete input schemas.
+- [Integration guide](skills/ourpay-wallet/references/INTEGRATIONS.md): all host profiles, model formats and framework examples.
+- [Troubleshooting](skills/ourpay-wallet/references/TROUBLESHOOTING.md): stale catalogs, funding failures and uncertain outcomes.
+- [Testing](skills/ourpay-wallet/references/TESTING.md): what fixture, testnet and live checks actually establish.
+- [Agent skill](skills/ourpay-wallet/SKILL.md): task-oriented instructions loaded by supported hosts.
+
+Tagged releases are fixed snapshots. Updated repository documentation does not modify an already installed executable or automatically refresh its host's catalog. Repository packages and generated profiles do not imply vendor marketplace approval.
