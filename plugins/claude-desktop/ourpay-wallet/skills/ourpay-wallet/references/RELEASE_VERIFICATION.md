@@ -1,4 +1,34 @@
-# OurPay Wallet 0.10.0 release verification
+# OurPay Wallet release verification
+
+## 0.11.0 — live payment verification, September 27, 2026
+
+The release adds bounded recurring checkout consent, approval/authorization transaction tracking, automatic purchase reconciliation, actionable status text and an early payment-submission email. The original pending Ethereum purchase settled with its original transaction; no replacement charge was sent.
+
+| Live test | Observed result |
+| --- | --- |
+| One-time $1 Ethereum checkout | Exact 1.000107-USDC invoice paid; one canonical order and one benefit grant; a completed retry returned the same order and transaction |
+| Subscription $1 Polygon checkout | Exact 1-USDC first charge, canonical order and active subscription; finite monthly mandate with a two-payment maximum |
+| Test cleanup | Subscription canceled immediately; executor cancellation transaction confirmed and on-chain mandate recorded canceled |
+| Funding | Gasless Arbitrum routes delivered 7.804359854165330341 POL from 1 USDC and 1.965615 Polygon USDC from 2 USDC; source/destination settlement verified |
+| Fees | Both $1 orders recorded the configured Starter fee of $0.55; treasury collection accounting does not create fiat withdrawal credit |
+| Early email | Provider accepted the Ethereum submission notice 16.2 seconds after broadcast and the subscription notice 1.6 seconds after broadcast |
+| Final notifications | Buyer/merchant notifications accepted within about two seconds of each canonical order; cancellation email accepted about 1.4 seconds after cancellation |
+
+Ethereum's finalized block lagged the successful receipt. The final receipt therefore followed settlement roughly 16 minutes after broadcast, while the early notice explained that processing was ongoing. Provider acceptance is not proof of inbox arrival. The connected mailbox differed from the receipt recipients, so inbox delivery was not independently verified.
+
+The merchant's external subscription webhook returned HTTP 530 / Cloudflare origin DNS error. Retries remain queued; downstream webhook fulfillment is not a passing result. The one-time product's OurPay benefit grant did complete. Monthly renewal was tested on isolated Anvil chains in the previous release, not by waiting a month or accelerating a production billing period.
+
+Live tests also exposed a Polygon RPC timeout and a provider log-range rejection. The existing subscription RPC was switched to the configured wallet provider without changing deployment identity, keys or limits. Authorization discovery now reads at most 100 finalized blocks per page; failed reads preserve the cursor. Known transaction hashes continue through direct receipt verification.
+
+### Checks and publication
+
+- Targeted purchase/subscription/approval suite: 31 passed; email-renderer test: 1 passed; readiness and scan recovery: 8 passed. Sets overlap with earlier broader runs.
+- SDK: 38 passed, 4 optional groups skipped; wallet approval UI: 7 passed. Relevant lint/typechecks, client generation and production wallet build passed.
+- [Release v0.11.0](https://github.com/Ourpay/ourpay-wallet/releases/tag/v0.11.0): seven GitHub archives and wallet-site copies matched checksums. Source CI `36330767426` and tag CI `36330866598` passed.
+- Both MCP services and the wallet frontend were deployed. The catalog remains 57 tools; the existing purchase tools accept the new recurring terms.
+- This report is updated after acceptance tests. Previously published version archives remain immutable. The registry was still advertising 0.10.0 at the last check; its hosted endpoint serves the updated runtime.
+
+## Historical 0.10.0 verification
 
 Recorded September 27, 2026. This report separates deployed functionality, automated coverage and observed production behavior.
 
